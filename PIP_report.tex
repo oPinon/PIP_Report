@@ -22,6 +22,8 @@
 % Try to graph evolution of computing time versus the number of states/nodes in a SDD
 % Change the intro to talk about the matrix algorithm too, and not just Force
 % Fix the bibliography (the name of a Paper should be clickable)
+% Explain why Order_pre_post and Order_edges would improve
+% Present the results of the benchmark with stats
 % Try to graph the evolution of Span with Force, and find an otpimal criteria to end the algo.
 % find another name for the "matrix" algorithm.. maybe "genetic" ?
 
@@ -90,13 +92,15 @@ In the case of tiny diagrams, a human can reorder it and let the computer handle
 
 \chapter{FORCE : A powerful algorithm that can easily be enhanced}
 
+\section{The basic version}
+
 Taking root in the natural laws of gravity, the FORCE algorithm has been described in \textit{FORCE : A Fast and Easy-To-Implement Variable-Ordering Heuristic} [3]. The algorithm itself is as simple as using forces of attraction between variables. The variables are ordered on a line, given a position, and are attracted to the variables they are linked to. The diagram will thus organize itself in a simpler way, and should be easier to deal with afterwards.
 
 First, the variables are defined, and then the hyperedges which represent the links between variables. The particularity of an hyperedge is that it can bind together more than 2 variables. At the beginning, the variables are given an initial position on a line, representing the initial order. After that, iterations are repeated until a suitable order is reached :
 
 \begin{algorithm}
 \begin{algorithmic}[1]
-\Function {FORCE}{$variables, edges$}
+\Function {FORCE}{$variables$, $edges$}
   \Repeat
     \ForAll {$edges$}
       \State {compute its $COG$}
@@ -138,9 +142,45 @@ To help us in our work, we created a program to display the variable order. It p
 
 On the left are the hyperedges that connect the different variables. The further they are on the left, the higher their span is. On the right are the variables (known as places in this case, hence p1, p2, \ldots)
 
-FORCE is mainly used to deal with BDDs, but in our case, the SDDs provide another information. As a matter of fact, the links represent operations used on the variables to build the graph, and therefore have a direction. It means that a variable depends on another, and the link between variables can be unidirectional or bidirectional. It seems intuitive to put a variable after the ones it depends on. A variable others depend on is called PRE, a variable depending on a another is a POST, and a bidirectional link involves PRE-POST variables. Using that information before each iteration of the algorithm proved to help decrease the span further in most cases, and can thus be considered a satisfying improvement.
+\section{The PRE-POST enhancement}
 
-We have adapted that algorithm to SDDs, and despite its simplicity, the results shown in the next part appear to be satisfying in many cases.
+Because the Model-Checker we use is based on Petri Networks, there is another information we can use to build the order. As a matter of fact, the links (also called \enquote{transitions}) represent operations used on the variables to build the graph, and therefore have a direction. It means that a variable depends on another, and the link between variables can be unidirectional or bidirectional. It seems intuitive to put a variable after the ones it depends on. A variable others depend on is called PRE, a variable depending on a another is a POST, and a bidirectional link involves PRE-POST variables. Using that information before each iteration of the algorithm proved to help decrease the span further in some cases.
+This operation can be done as so :
+%TODO explain why this can enhance the computation
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\Function {Order PRE-POST}{$variables$, $edges$}
+  \State {compute the edges' COGs}
+  \State {sort the $edges$ to have the ones with the highest span at the beginning} %TODO: this is actually order_pre_post reversed
+  \ForAll{$edges$}
+    \State {sort the $variables$ in order to have the $PRE$, then the $PRE-POST$ and finally the $POST$}
+    \State {place these $variables$ in that order around the edge's $COG$}
+  \EndFor
+  \State {compute the new order according to the $variables$' positions}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+In theory, sorting the edges at the beginning allows the order not to be too much changed, while still forcing the transition types to be as much sorted as possible. Hence when processing an edge, we take the variables from all over and gather them at the edge's COG. Right after being processed, the edge has a minimal span; but because processing the next edges will also move the variables, it will progressivly be unmade. This is the reason why we start by applying it to the edges with the highest span, and end with those with the lowest. The edges we process first probably won't respect the rule because the future operations will unmake the first ones; however we want to make sure that the edges with the smallest span do respect it, and because they are processed last, they will end with a minimal span.
+
+This is of course speculation, and we launched tests with this version of the algorithm, but also tests with the reversed version which processes edges from the smallest to the biggest span.
+
+\section{Sorting the edges}
+
+The last enhancement we tried was to order the edges according to their number of variables :
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\Function {Order Edges}{$variables$, $edges$}
+  \State {do a stable sort of the $edges$ according to the number of variables they connect to}
+  \State {compute the $edges$' $COG$s according to that order}
+  \State {compute the variables' new positions according to the $edges$' $COG$s}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+This operation may reduce the model-checker's computing time because when operations are applied on a SDD to construct it, these operations propagate from the top ofthe diagram and then are repeated further in the diagram until they reach a certain criteria. ?????????????? CF MAILS
 
 \chapter{Experimental results}
 
@@ -183,7 +223,7 @@ Like before, the only available action on the model is to change the variable or
 We started by trying to find a way, given a random binary matrix, to get the ones closer from each other. The following pseudo-code has been tried :
 
 \begin{algorithm}
-\begin{algorithmic}[2]
+\begin{algorithmic}[1]
 \Function {matrix\_order}{$matrix$}
   \While {the norm keeps decreasing}
     \State {$c_1$ = the column with the highest norm}
