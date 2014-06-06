@@ -11,6 +11,8 @@
 \usepackage{verbatim}
 \usepackage{subfigure}
 \usepackage{hyperref}
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
 \usepackage[english=british]{csquotes}
 
 %\DeclareUnicodeCharacter{003A}{:}
@@ -89,6 +91,22 @@ First, the variables are defined, and then the hyperedges which represent the li
   \item Assign each variable a new position, based on the mean value of the center of gravity of the hyperedges connected to the variable.
   \item Reorder the variables according to their new position.
 \end{itemize}
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\Function {FORCE}{$variables, edges$}
+  \Repeat
+    \ForAll {$edges$}
+      \State {compute its $COG$} \Comment {$COG$: mean value of the variables it connects}
+    \EndFor
+    \ForAll {$variables$}
+      \State {compute its new $position$} \Comment {$position$: mean value of the $COG$s of its connected edges}
+    \EndFor
+    \State {reorder the variables according to their position}
+  \Until {the total span stops decreasing}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
 
 \begin{figure}[!h]
   \centering
