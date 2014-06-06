@@ -128,13 +128,37 @@ The FORCE algorithm and the enhanced version of FORCE have been tested using som
 
 The tests have shown that although FORCE does give better result in many cases, the most significant results are achieved with the enhanced version of FORCE. For the House Construction 010 problem, computation has been improved fourfold, and it gives similar results in many cases. However, the computation time has not been improved in every case. It appears that if the order is already considered \enquote{good}, the algorithm tends to worsen it. Further work will determine the reasons behind such behavior.
 
-\chapter{A simple matrix representation}
+\chapter{A genetic algorithm}
 
-Seeing what could be achieved with simple methods, we designed another algorithm based on matrices, the most widely used representation for problems in mathematics. The principle is to put the variables on the lines, and the operations (the hyperedges) on the columns. If a variable is used in an operation, a 1 is put inside the corresponding line and column intersection. Else, a 0 is placed.
+Seeing what could be achieved with simple methods, we designed another algorithm based on matrices, the most widely used representation for problems in mathematics. The rationale was to speed up the calculations by simplifying the representation of the Hyper Edges.
+\\\\
+The principle is that a matrix will represent one model. The lines represent the variables of the model, thus the current variable order, and the columns represent the different operations (as know as the hyper edges) used to build the state space. If a variable is involved in a certain operation, a 1 is put at the corresponding line and column intersection. After having considered all the variables and their link to the hyper edges, the rest of the matrix is filled with zeros.
 
-To compute the optimal variable order, a specific value is monitored : for each column, the number of 0 between the first 1 and the last 1 is computed, and then we sum those results. It can be seen as the \enquote{area} of the matrix, or its \enquote{void rate}. The more 0 there are inside the columns, the more separated the variables are and the longer the model checking should be.
+\begin{figure}[!h]
+  \centering
+  $\bordermatrix{
+  ~ & h_1 & h_2 & h_3 & h_4 & h_5 & h_6 \cr
+  v_1 & 1 & 1 & 0 & 0 & 1 & 0 \cr
+  v_2 & 0 & 1 & 1 & 0 & 1 & 0 \cr
+  v_3 & 0 & 1 & 0 & 1 & 0 & 1 \cr
+  v_4 & 1 & 0 & 0 & 1 & 0 & 0 \cr
+  v_5 & 0 & 1 & 0 & 1 & 1 & 1 \cr
+  v_6 & 1 & 0 & 1 & 0 & 0 & 0\cr
+  }$
+  \caption{A binary matrix representing a random model}
+  \label{example_matrix}
+\end{figure}
 
-In order to reduce this \enquote{norm}, we can only switch two lines together, which amounts to changing the variable order. Several versions of the algorithm were tested, trying various techniques to reduce the \enquote{norm}, unfortunately none has proven significantly useful so far. The progress made thanks to these algorithms were far too slow and small to consider using them. That is why a different technique has been chosen, using a genetic algorithm. 
+As opposed to Force, this representation of a model requires a new way to determine the end of the algorithm. As a matter of fact, the span cannot be computed the same way as before. In the following paragraphs, the term \enquote{\it{norm}} will be used to designate the value representing whether an order will be considered \enquote{good} or not. It is the equivalent of the span. This norm can be computed as follows:
+For each column, the number of 0 between the first and last $1$ of that column is determined. After that, the results from each column are added together, and give the norm of the matrix. It can be seen as the \enquote{area} of the matrix. The lower the area, the more separated the variables are, and just as it was intuited for Force, the longer the model checking should be.
+
+Like before, the only available action on the model is to change the variable order and this is done here by switching two lines together. Several versions of the algorithm were tested, trying various techniques to reduce the norm, unfortunately none has proven significantly useful so far. 
+
+We started by trying to find a way, given a random binary matrix, to get the ones closer from each other. The following pseudo-code has been tried :
+
+
+
+The progress made thanks to these algorithms were far too slow and small to consider using them. That is why a different technique has been chosen, using a genetic algorithm. 
 
 An initial matrix is created, based on the model. Then 100 lines are switched at random, two by two, thus creating 100 \enquote{mutated} matrices. Only the 5 matrices with the best \enquote{norm} are kept, and the algorithm starts again by creating 100 new matrices out of these 5, and selecting 5 once more. It is slower than a real norm reduction strategy, but it is far more powerful. This algorithm should be used if time is not of the essence in the model checker that is being run.
 
