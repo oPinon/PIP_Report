@@ -42,7 +42,7 @@ First and foremost, a system, may it be a plane, a program or a spaceship, can b
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[scale=0.5]{basic_bdd.jpg}
+  \includegraphics[scale=0.5]{images/basic_bdd.jpg}
   \caption{A simple BDD}
   \label{basic_bdd}
 \end{figure}
@@ -55,7 +55,7 @@ However, this BDD can easily be reduced by noticing that if both $x_1$ and $x_2$
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[scale=0.8]{compact_bdd.jpg}
+  \includegraphics[scale=0.8]{images/compact_bdd.jpg}
   \caption{The same but reduced BDD}
   \label{compact_bdd}
 \end{figure}
@@ -65,10 +65,10 @@ A noticable thing in this diagram is that if you change the order of the variabl
 \begin{figure}[!h]
   \centering
   \subfigure{
-    \includegraphics[scale=0.45]{big_bdd.jpg}
+    \includegraphics[scale=0.45]{images/big_bdd.jpg}
   }
   \subfigure{
-    \includegraphics[scale=0.5]{small_bdd.jpg}
+    \includegraphics[scale=0.5]{images/small_bdd.jpg}
   }
   \caption{The same BDDs with different variable orders}
   \label{reduction_bdd}
@@ -92,7 +92,7 @@ First, the variables are defined, and then the hyperedges which represent the li
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[scale=0.7]{force_span.jpg}
+  \includegraphics[scale=0.7]{images/force_span.jpg}
   \caption{A BDD before and after being reordered}
   \label{force_span}
 \end{figure}
@@ -103,7 +103,7 @@ In figure~\ref{order_graph}, 4 variables linked by 3 hyperedges can be seen. In 
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[scale=0.5]{representation_order.jpg}
+  \includegraphics[scale=0.5]{images/representation_order.jpg}
   \caption{A graphic representation of the SDD}
   \label{order_graph}
 \end{figure}
@@ -121,7 +121,7 @@ We have adapted that algorithm to SDDs, and despite its simplicity, the results 
 The FORCE algorithm and the enhanced version of FORCE have been tested using some of the most common computer science problems. In each case, we prompted the time needed to apply the model checker and get a solution.
 
 \begin{figure}[!h]
-  \includegraphics[scale=0.35]{force_results.jpg}
+  \includegraphics[scale=0.35]{images/force_results.jpg}
   \caption{Experimental results using the FORCE algorithm and its enhanced version}
   \label{force_results}
 \end{figure}
