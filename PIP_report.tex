@@ -182,9 +182,24 @@ Like before, the only available action on the model is to change the variable or
 
 We started by trying to find a way, given a random binary matrix, to get the ones closer from each other. The following pseudo-code has been tried :
 
+\begin{algorithm}
+\begin{algorithmic}[2]
+\Function {matrix\_order}{$matrix$}
+  \While {the norm keeps decreasing}
+    \State {$c_1$ = the column with the highest norm}
+    \State {switch the rows of the first 0 after the first 1 and the last 1 of the column}
+    \If {$newNorm \geq oldNorm$}
+      \State {try again with $c_2$ : the column that has the second highest norm}
+    \EndIf
+  \EndWhile
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
 
+Although this algorithm works satisfactorily for small matrices, \enquote{real} models contain thousands of variables, and a switch that lowers the norm of a single column willmost certainly increase the norm of a hundred other columns.
+After several attempts at finding an algorithm that worked in every case, it became increasingly clear that finding one such algorithm would not be easy, and would take a great amount of time.
 
-The progress made thanks to these algorithms were far too slow and small to consider using them. That is why a different technique has been chosen, using a genetic algorithm. 
+Thereforce, we decided another approach, that could be easily implemented and which would certainly wield acceptable results : a genetic algorithm. 
 
 An initial matrix is created, based on the model. Then 100 lines are switched at random, two by two, thus creating 100 \enquote{mutated} matrices. Only the 5 matrices with the best \enquote{norm} are kept, and the algorithm starts again by creating 100 new matrices out of these 5, and selecting 5 once more. It is slower than a real norm reduction strategy, but it is far more powerful. This algorithm should be used if time is not of the essence in the model checker that is being run.
 
