@@ -158,6 +158,29 @@ On the left are the hyperedges that connect the different variables. The further
 In figure~\ref{force_plot} can be seen the evolution of the $span$ during Force's execution. In most of the 162 cases the span reaches its minimal value within the first ten iterations, but there are a dozen of cases that behaves in another way : they first rich a minimal value, but then the span increases to finally at a higher value. There is also cases where the span settles in a periodic evolution. Considering those two cases, stopping Force as soon a the span stops decreasing might seem as the best idea, but there is one last case : the span might increase for a while, but then decrease to reach a final, much lower, value.
 The solution we finally choosed was to terminate Force when the span had stayed higher than its minimal value for 100 iterations. And the final order was the one corresponding to the minimal span.
 
+\begin{figure}[H]
+    \subfigure[duration vs the number of variables]{
+      \includegraphics[width=0.45\textwidth]{images/time_vs_var.png}
+      \label{time_vs_var}
+    }
+    \subfigure[duration vs the number of edges]{
+      \includegraphics[width=0.45\textwidth]{images/time_vs_edges.png}
+      \label{time_vs_edges}
+    }
+    \subfigure[duration vs the sum of the numbers of variables and edges]{
+      \includegraphics[width=0.45\textwidth]{images/time_vs_(var+edges).png}
+      \label{time_vs_(var+edges)}
+    }
+    \subfigure[duration vs the product of the numbers of variables and edges]{
+      \includegraphics[width=0.45\textwidth]{images/time_vs_(var_x_edges).png}
+      \label{time_vs_(var_x_edges)}
+    }
+\label{force_duration}
+\caption{Duration of FORCE's execution (in ns) versus the samples' complexity, in a logarithmic scale.}
+\end{figure}
+
+The data that fits best its regression is ~\ref{time_vs_(var+edges)} with a correlation coefficient of R=0.993 and the model is $time({\mu}s)= {9.2}*x^{1.17}$. For example with one of the largest models that has $5*10^4$ variables and $5*10^4$ edges, the duration of force is $6.1$ seconds and the equation gives an estimation of $6.5$s.
+
 \section{The PRE-POST enhancement}
 
 Because the Model-Checker we use is based on Petri Networks, there is another information we can use to build the order. As a matter of fact, the links (also called \enquote{transitions}) represent operations used on the variables to build the graph, and therefore have a direction. It means that a variable depends on another, and the link between variables can be unidirectional or bidirectional. It seems intuitive to put a variable after the ones it depends on. A variable others depend on is called PRE, a variable depending on a another is a POST, and a bidirectional link involves PRE-POST variables. Using that information before each iteration of the algorithm proved to help decrease the span further in some cases.
