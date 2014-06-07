@@ -14,6 +14,7 @@
 \usepackage[noend]{algpseudocode}
 \usepackage{algorithm}
 \usepackage[english=british]{csquotes}
+\usepackage{pgfplots}
 
 %\DeclareUnicodeCharacter{003A}{:}
 
@@ -164,8 +165,6 @@ This operation can be done as so :
 
 In theory, sorting the edges at the beginning allows the order not to be too much changed, while still forcing the transition types to be as much sorted as possible. Hence when processing an edge, we take the variables from all over and gather them at the edge's COG. Right after being processed, the edge has a minimal span; but because processing the next edges will also move the variables, it will progressivly be unmade. This is the reason why we start by applying it to the edges with the highest span, and end with those with the lowest. The edges we process first probably won't respect the rule because the future operations will unmake the first ones; however we want to make sure that the edges with the smallest span do respect it, and because they are processed last, they will end with a minimal span.
 
-This is of course speculation, and we launched tests with this version of the algorithm, but also tests with the reversed version which processes edges from the smallest to the biggest span.
-
 \section{Sorting the edges}
 
 The last enhancement we tried was to order the edges according to their number of variables :
@@ -190,6 +189,44 @@ The FORCE algorithm and the enhanced version of FORCE have been tested using som
   \includegraphics[scale=0.35]{images/force_results.jpg}
   \caption{Experimental results using the FORCE algorithm and its enhanced version}
   \label{force_results}
+\end{figure}
+
+\begin{figure}
+  \begin{tikzpicture}
+  \begin{axis}[
+    ybar stacked,
+    bar width=15pt,
+    nodes near coords,
+    enlargelimits=0.2,
+    ylabel={ Percentage of success },
+    symbolic x coords = {
+      Natural,
+      Force,
+      Order-Edges,
+      Order-Edges(Reversed),
+      Order-Edges+Pre-Post,
+      Order-Edges(Reversed)+Pre-Post,
+      Pre-Post,
+      Force2,
+      Force3
+    },
+    xtick=data,
+    x tick label style={rotate=45,anchor=east},
+    ]
+\addplot+[ybar] plot coordinates {
+  (Natural,27)
+  (Force,65)
+  (Order-Edges,58)
+  (Order-Edges(Reversed),58)
+  (Order-Edges+Pre-Post,65)
+  (Order-Edges(Reversed)+Pre-Post,65)
+  (Pre-Post,62)
+  (Force2,38)
+  (Force3,27)
+};
+\end{axis}
+  \end{tikzpicture}
+\caption {Percentage of success of each algorithm, over the cases where at least one algorithm succeeded}
 \end{figure}
 
 The tests have shown that although FORCE does give better result in many cases, the most significant results are achieved with the enhanced version of FORCE. For the House Construction 010 problem, computation has been improved fourfold, and it gives similar results in many cases. However, the computation time has not been improved in every case. It appears that if the order is already considered \enquote{good}, the algorithm tends to worsen it. Further work will determine the reasons behind such behavior.
