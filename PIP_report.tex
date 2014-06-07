@@ -130,8 +130,6 @@ First, the variables are defined, and then the hyperedges which represent the li
 
 To determine the quality of an order and know when to stop, the algorithm computes the span of the order (figure~\ref{force_span}). It is the sum of the span of every hyperedge. Once the \enquote{length} of the order has settled, the algorithm is complete and gives the final order.
 
-In figure~\ref{order_graph}, 4 variables linked by 3 hyperedges can be seen. In the first order, the hyperedges are long, and once reordered, they are shorter, meaning they have a lower span. The algorithm will not be able to find a better order, it will stop and give the optimal order.
-
 \begin{figure}[!h]
   \centering
   \includegraphics[scale=0.5]{images/representation_order.jpg}
@@ -139,9 +137,26 @@ In figure~\ref{order_graph}, 4 variables linked by 3 hyperedges can be seen. In 
   \label{order_graph}
 \end{figure}
 
+In figure~\ref{order_graph}, 4 variables linked by 3 hyperedges can be seen. In the first order, the hyperedges are long, and once reordered, they are shorter, meaning they have a lower span. The algorithm will not be able to find a better order, it will stop and give the optimal order.
+
 To help us in our work, we created a program to display the variable order. It particularly helps with finding symetries in a graph, or patterns that should be studied further.
 
 On the left are the hyperedges that connect the different variables. The further they are on the left, the higher their span is. On the right are the variables (known as places in this case, hence p1, p2, \ldots)
+
+
+\section{Force's execution time and termination criteria}
+
+\begin{figure}[H]
+  %\centering
+  \begin{center}
+  \includegraphics[width=1\textwidth]{images/force_plot.png}
+  \end{center}
+  \caption{The evolution of the span during FORCE, for a pool of 162 examples. In absciss are the number of iterations. The ordinates start at 0\% with the minimal span encountered during the evolution, and end at 100\% with the maximal span.}
+  \label{force_plot}
+\end{figure}
+
+In figure~\ref{force_plot} can be seen the evolution of the $span$ during Force's execution. In most of the 162 cases the span reaches its minimal value within the first ten iterations, but there are a dozen of cases that behaves in another way : they first rich a minimal value, but then the span increases to finally at a higher value. There is also cases where the span settles in a periodic evolution. Considering those two cases, stopping Force as soon a the span stops decreasing might seem as the best idea, but there is one last case : the span might increase for a while, but then decrease to reach a final, much lower, value.
+The solution we finally choosed was to terminate Force when the span had stayed higher than its minimal value for 100 iterations. And the final order was the one corresponding to the minimal span.
 
 \section{The PRE-POST enhancement}
 
@@ -179,7 +194,7 @@ The last enhancement we tried was to order the edges according to their number o
 \end{algorithmic}
 \end{algorithm}
 
-This operation may reduce the model-checker's computing time because when operations are applied on a SDD to construct it, these operations propagate from the top ofthe diagram and then are repeated further in the diagram until they reach a certain criteria. ?????????????? CF MAILS
+This operation may reduce the model-checker's computing time because when operations are applied on a SDD to construct it, these operations propagate from the top ofthe diagram and then are repeated further in the diagram until they reach a certain criteria. ??????????????
 
 \chapter{Experimental results}
 
@@ -192,6 +207,7 @@ The FORCE algorithm and the enhanced version of FORCE have been tested using som
 \end{figure}
 
 \begin{figure}
+  \begin{center}
   \begin{tikzpicture}
   \begin{axis}[
     ybar stacked,
@@ -225,7 +241,8 @@ The FORCE algorithm and the enhanced version of FORCE have been tested using som
   (Force3,27)
 };
 \end{axis}
-  \end{tikzpicture}
+\end{tikzpicture}
+\end{center}
 \caption {Percentage of success of each algorithm, over the cases where at least one algorithm succeeded}
 \end{figure}
 
