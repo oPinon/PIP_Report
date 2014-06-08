@@ -219,58 +219,6 @@ The last enhancement we tried was to order the edges according to their number o
 
 This operation may reduce the model-checker's computing time because when operations are applied on a SDD to construct it, these operations propagate from the top ofthe diagram and then are repeated further in the diagram until they reach a certain criteria. ??????????????
 
-\chapter{Experimental results}
-
-The FORCE algorithm and the enhanced version of FORCE have been tested using some of the most common computer science problems. In each case, we prompted the time needed to apply the model checker and get a solution.
-
-\begin{figure}[!h]
-  \includegraphics[scale=0.35]{images/force_results.jpg}
-  \caption{Experimental results using the FORCE algorithm and its enhanced version}
-  \label{force_results}
-\end{figure}
-
-\begin{figure}
-  \begin{center}
-  \begin{tikzpicture}
-  \begin{axis}[
-    ybar stacked,
-    bar width=15pt,
-    nodes near coords,
-    enlargelimits=0.2,
-    ylabel={ Percentage of success },
-    symbolic x coords = {
-      Natural,
-      Force,
-      Order-Edges,
-      Order-Edges(Reversed),
-      Order-Edges+Pre-Post,
-      Order-Edges(Reversed)+Pre-Post,
-      Pre-Post,
-      Force2,
-      Force3
-    },
-    xtick=data,
-    x tick label style={rotate=45,anchor=east},
-    ]
-\addplot+[ybar] plot coordinates {
-  (Natural,27)
-  (Force,65)
-  (Order-Edges,58)
-  (Order-Edges(Reversed),58)
-  (Order-Edges+Pre-Post,65)
-  (Order-Edges(Reversed)+Pre-Post,65)
-  (Pre-Post,62)
-  (Force2,38)
-  (Force3,27)
-};
-\end{axis}
-\end{tikzpicture}
-\end{center}
-\caption {Percentage of success of each algorithm, over the cases where at least one algorithm succeeded}
-\end{figure}
-
-The tests have shown that although FORCE does give better result in many cases, the most significant results are achieved with the enhanced version of FORCE. For the House Construction 010 problem, computation has been improved fourfold, and it gives similar results in many cases. However, the computation time has not been improved in every case. It appears that if the order is already considered \enquote{good}, the algorithm tends to worsen it. Further work will determine the reasons behind such behavior.
-
 \chapter{A genetic algorithm}
 
 Seeing what could be achieved with simple methods, we designed another algorithm based on matrices, the most widely used representation for problems in mathematics. The rationale was to speed up the calculations by simplifying the representation of the Hyper Edges.
@@ -332,13 +280,65 @@ After all the iterations have been completed, the best matrix in the pool is sel
 In order to chose the amount of matrices to create, 4 variables must be given to the algorithm :
 
 \begin{itemize}
-  \item INITIAL_POPULATION : the initial number of matrices created from the original one.
-  \item ITERATION_NUMBER : the number of iterations of the algorithm. This is the primary way to improve the order and have a lower norm.
-  \item MUTATION_NUMBER : the number of matrices created by the mutation process. Every matrix of the current matrix set will create that number of matrices.
-  \item SELECTION_NUMBER : the number of matrices selected at the end of an iteration, it will influence genetic mixing, and may better the results of the algorithm.
+  \item $INITIAL\_POPULATION$ : the initial number of matrices created from the original one.
+  \item $ITERATION\_NUMBER$ : the number of iterations of the algorithm. This is the primary way to improve the order and have a lower norm.
+  \item $MUTATION\_NUMBER$ : the number of matrices created by the mutation process. Every matrix of the current matrix set will create that number of matrices.
+  \item $SELECTION\_NUMBER$ : the number of matrices selected at the end of an iteration, it will influence genetic mixing, and may better the results of the algorithm.
 \end{itemize}
 
 All these variables allow the algorithm to be extremely flexible to the needs of the user. 
+
+\chapter{Experimental results}
+
+The FORCE algorithm and the enhanced version of FORCE have been tested using some of the most common computer science problems. In each case, we prompted the time needed to apply the model checker and get a solution.
+
+\begin{figure}[!h]
+  \includegraphics[scale=0.35]{images/force_results.jpg}
+  \caption{Experimental results using the FORCE algorithm and its enhanced version}
+  \label{force_results}
+\end{figure}
+
+\begin{figure}
+  \begin{center}
+  \begin{tikzpicture}
+  \begin{axis}[
+    ybar stacked,
+    bar width=15pt,
+    nodes near coords,
+    enlargelimits=0.2,
+    ylabel={ Percentage of success },
+    symbolic x coords = {
+      Natural,
+      Force,
+      Order-Edges,
+      Order-Edges(Reversed),
+      Order-Edges+Pre-Post,
+      Order-Edges(Reversed)+Pre-Post,
+      Pre-Post,
+      Force2,
+      Force3
+    },
+    xtick=data,
+    x tick label style={rotate=45,anchor=east},
+    ]
+\addplot+[ybar] plot coordinates {
+  (Natural,27)
+  (Force,65)
+  (Order-Edges,58)
+  (Order-Edges(Reversed),58)
+  (Order-Edges+Pre-Post,65)
+  (Order-Edges(Reversed)+Pre-Post,65)
+  (Pre-Post,62)
+  (Force2,38)
+  (Force3,27)
+};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\caption {Percentage of success of each algorithm, over the cases where at least one algorithm succeeded}
+\end{figure}
+
+The tests have shown that although FORCE does give better result in many cases, the most significant results are achieved with the enhanced version of FORCE. For the House Construction 010 problem, computation has been improved fourfold, and it gives similar results in many cases. However, the computation time has not been improved in every case. It appears that if the order is already considered \enquote{good}, the algorithm tends to worsen it. Further work will determine the reasons behind such behavior.
 
 \newpage
 \section*{Conclusion} %TODO : PUT IT WITHOUT THE NUMBERS !!!
