@@ -341,11 +341,13 @@ The FORCE algorithm and the enhanced version of FORCE have been tested using som
 The tests have shown that although FORCE does give better result in many cases, the most significant results are achieved with the enhanced version of FORCE. For the House Construction 010 problem, computation has been improved fourfold, and it gives similar results in many cases. However, the computation time has not been improved in every case. It appears that if the order is already considered \enquote{good}, the algorithm tends to worsen it. Further work will determine the reasons behind such behavior.
 
 \newpage
-\section*{Conclusion} %TODO : PUT IT WITHOUT THE NUMBERS !!!
+\section*{Conclusion}
 
-The Hierarchical Set Decision Diagrams have been designed to be a fast and efficient representation of state spaces for model checking. We showed that applying a pre-processing algorithm to determine an optimal variable order can sometimes greatly reduce the time needed to run the model checker. The enhanced version of FORCE seems to be efficient in most cases. FORCE takes very little time to be applied and seldom deteriorates the variable order. However, some cases remain where nor the initial order, nor the FORCE order lead to a reasonable computing time.
+The Hierarchical Set Decision Diagrams have been designed to be a fast and efficient representation of state spaces for model checking. Although using SDD cut the memory usage of the model checker, further work on the SDD is possible to greatly enhance its computing time. We showed that applying a pre-processing algorithm to determine an optimal variable order can sometimes greatly reduce the time needed to run the model checker. The enhanced version of FORCE seems to be efficient in most cases.
 
-Future studies should aim at determining why certain models reject the use of FORCE, and what could be done to improve it. A solution might also be to try and imagine new algorithms, but since SDDs are so difficult to grasp, it will be some time before we achieve better results than FORCE. The matrix algorithm is working very well in most cases, but takes a lot more time. This is why it is crucial to have various algorithms available, in order to apply the one suited for the situation.
+After more than 120 hours of benchmarking, we can confirm that Force takes very little time to be applied and seldom deteriorates the variable order. However, some cases remain where nor the initial order, nor the Force order lead to a reasonable computing time. The parameters influencing the quality of the order could not be identified, and a better understanding of these parameters would surely lead to a more efficient version of Force. Future studies should aim at determining why certain models reject the use of FORCE, and what could be done to improve it.
+
+A solution might also be to try and imagine new algorithms, but since SDDs are so difficult to grasp, it will be some time before we achieve better results than Force. The genetic algorithm we designed works very well in many cases, but takes a lot more time. This is why it is crucial to have various algorithms available, in order to apply the one suited for the situation.
 
 \printbibliography
 
