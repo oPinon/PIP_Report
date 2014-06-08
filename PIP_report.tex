@@ -318,7 +318,27 @@ After several attempts at finding an algorithm that worked in every case, it bec
 
 Thereforce, we decided another approach, that could be easily implemented and which would certainly wield acceptable results : a genetic algorithm. 
 
-An initial matrix is created, based on the model. Then 100 lines are switched at random, two by two, thus creating 100 \enquote{mutated} matrices. Only the 5 matrices with the best \enquote{norm} are kept, and the algorithm starts again by creating 100 new matrices out of these 5, and selecting 5 once more. It is slower than a real norm reduction strategy, but it is far more powerful. This algorithm should be used if time is not of the essence in the model checker that is being run.
+The algorithm consists in 3 distinct phases :
+
+\begin{itemize}
+  \item Initialization : a set of matrices is created from the original matrix, and are created by switching 2 rows at random.
+  \item Mutation : from each matrix in the aforementioned set, a certain amount of matrices is created once again, thus creating a pool of matrices.
+  \item Selection : this pool is then sorted from the lowest to the greatest norm, and a few of the best matrices are selected to act as the set of the next mutation.
+\end{itemize}
+
+The last two phases are repeated until the end. And what is particularly interesting with this algorithm, is that the longer it is run, the better the results will be. This way, the algorithm can be adjusted according to the time available and the expected results. The algorithm will stop after all the iterations have been completed.
+After all the iterations have been completed, the best matrix in the pool is selected, and by tracing back the different rows switched, the new order is created.
+
+In order to chose the amount of matrices to create, 4 variables must be given to the algorithm :
+
+\begin{itemize}
+  \item INITIAL_POPULATION : the initial number of matrices created from the original one.
+  \item ITERATION_NUMBER : the number of iterations of the algorithm. This is the primary way to improve the order and have a lower norm.
+  \item MUTATION_NUMBER : the number of matrices created by the mutation process. Every matrix of the current matrix set will create that number of matrices.
+  \item SELECTION_NUMBER : the number of matrices selected at the end of an iteration, it will influence genetic mixing, and may better the results of the algorithm.
+\end{itemize}
+
+All these variables allow the algorithm to be extremely flexible to the needs of the user. 
 
 \newpage
 \section*{Conclusion} %TODO : PUT IT WITHOUT THE NUMBERS !!!
