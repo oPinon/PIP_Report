@@ -155,8 +155,8 @@ On the left are the hyperedges that connect the different variables. The further
   \label{force_plot}
 \end{figure}
 
-In figure~\ref{force_plot} can be seen the evolution of the $span$ during Force's execution. In most of the 162 cases the span reaches its minimal value within the first ten iterations, but there are a dozen of cases that behaves in another way : they first rich a minimal value, but then the span increases to finally at a higher value. There is also cases where the span settles in a periodic evolution. Considering those two cases, stopping Force as soon a the span stops decreasing might seem as the best idea, but there is one last case : the span might increase for a while, but then decrease to reach a final, much lower, value.
-The solution we finally choosed was to terminate Force when the span had stayed higher than its minimal value for 100 iterations. And the final order was the one corresponding to the minimal span.
+In figure~\ref{force_plot} can be seen the evolution of the $span$ during Force's execution. In most of the 162 cases the span reaches its minimal value within the first ten iterations, but there are a dozen of cases that behaves in another way : they first reach a minimal value, but then the span increases to finally stabilize at a higher value. There is also cases where the span settles in a periodic evolution. Considering those two cases, stopping Force as soon as the span stops decreasing might seem like the best idea, but there is one last case : the span might increase for a while, but then decrease to reach a final, much lower, value.
+The solution we finally chose was to terminate Force when the span had stayed higher than its minimal value for 100 iterations and establish the final order as the one corresponding to the minimal span reached during these iterations.
 
 \begin{figure}[H]
     \subfigure[duration vs the number of variables]{
@@ -282,8 +282,8 @@ In order to chose the amount of matrices to create, 4 variables must be given to
 \begin{itemize}
   \item $INITIAL\_POPULATION$ : the initial number of matrices created from the original one.
   \item $ITERATION\_NUMBER$ : the number of iterations of the algorithm. This is the primary way to improve the order and have a lower norm.
-  \item $MUTATION\_NUMBER$ : the number of matrices created by the mutation process. Every matrix of the current matrix set will create that number of matrices.
-  \item $SELECTION\_NUMBER$ : the number of matrices selected at the end of an iteration, it will influence genetic mixing, and may better the results of the algorithm.
+  \item $MUTATION\_SIZE$ : the number of matrices created by the mutation process. Every matrix of the current matrix set will create that number of matrices.
+  \item $SELECTION\_SIZE$ : the number of matrices selected at the end of an iteration, it will influence genetic mixing, and may better the results of the algorithm.
 \end{itemize}
 
 All these variables allow the algorithm to be extremely flexible to the needs of the user. 
