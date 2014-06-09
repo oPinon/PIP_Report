@@ -296,12 +296,14 @@ All these variables allow the algorithm to be extremely flexible to the needs of
 The Force algorithm and the enhanced version of Force have been tested using some of the most common computer science problems. In each case, we prompted the time needed to apply the model checker and get a solution.
 
 \begin{figure}[!h]
-  \includegraphics[scale=0.35]{images/force_results.jpg}
-  \caption{Experimental results using the Force algorithm and its enhanced version}
-  \label{force_results}
+  \begin{center}
+    \includegraphics[scale=0.33]{images/force_results.jpg}
+    \caption{Experimental results using the Force algorithm and its enhanced version}
+    \label{force_results}
+  \end{center}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!h]
   \begin{center}
   \begin{tikzpicture}
   \begin{axis}[
@@ -364,7 +366,7 @@ Like Force, the genetic algorithm has been tested in the same cases, with the sa
 
 After running the benchmark, it appeared that the genetic algorithm only finishes the calculation in the cases where the natural order finishes. As the algorithm does not change the nature of the model, and does not use a particular representation like Force, it seems only logical that the percentage of success is kept at the same level.
 
-
+It can be first noticed that no order of magnitude is gained nor lost due to the algorithm. The best that was achieved was cutting the computing time by half in one case. However, there are still many cases in which the genetic algorithm worsen the order in a way that is not fully understood yet. From that fact can be deduced that just as we had to take more parameters into account for Force, the quality of the order is not entirely dependent on the norm of the matrix used to represent the model. Therefore, a future work would consist in finding the various parameters that influence the order, and implement them in a new algorithm that may yield better results
 
 \section{Comparison of the two algorithms}
 
