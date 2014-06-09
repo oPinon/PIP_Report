@@ -441,6 +441,13 @@ It can be first noticed that no order of magnitude is gained nor lost due to the
   \end{center}
 \end{table}
 
+In the above results ~\ref{all_results} the empty fields mean that the computation took more than 20 minutes and was thus aborted. In addition, we considered irrelevant and didn't include the models where computation time was under 1 second in these data.
+Overall, Force based heuristics (from 8 to 16) often reduce computation time by orders of magnitude, up to $10^5$; this is the reason why many models that couldn't be solved from the natural order, can be computed in a reasonable time after these heuristics.
+
+Genetic based heuristics, in most of the cases, lead to an improvement too, but at much reduced scale, at most by ten. The reason why is that it is a much slower algorithm than force, and for the same amount of time, it leads to less improvements to the order. But further optimization of this algorithm, for example by using parallel computing, could improve its efficiency.
+
+However it is still hard to determine which heuristic is best : For example, the basic version of Force, which performs the best in most cases, worthen the order for the models \enquote{Vasy2003} and \enquote{HouseConstruction-020}. And the basic version of \enquote{Pre-Post} leads to a worse computing time than Force in most cases, but it does far better than any other heuristic for the model \enquote{MAPK-80}.
+
 \chapter{Parameters influencing the quality of a variable order}
 
 Thanks to the two algorithms and the extensive benchmark that has been applyied to them, it appeared that some variable orders were worsened by the algorithms. As they only lower the span or the norm, the results might seem to contradict the theory established so far.
@@ -450,12 +457,11 @@ While the cases where reducing the norm works prove that it is one way to improv
 
 That is where the experiments conducted on Force are extremely useful. As a matter of fact, some of these parameters can be extracted from the different versions of Force.
 
-First, the variables seem to depend on one another. As the model is extracted from a Petri network, some variables are used before others in that network, and it appears that placing them before in the variable order improves its quality. That phenomenon might be explained by the importance of the position of the variables in the branching system of the Petri network. If a variable is used before a new branch in the network, placing it after inside the variable order of the model-checker appears to complexify the model, and lead to an increased computing time. The results of Force \enquote{Pre-Post} are following the same pattern in most cases. Using this enhanced algorithm gives better results and prove that it is one parameter that might influence the quality of the order.
+First, the variables seem to depend on one another. As the model is extracted from a Petri network, some variables are used before others in that network, and it appears that placing them before in the variable order improves its quality. That phenomenon might be explained by the importance of the position of the variables in the branching system of the Petri network. If a variable is used before a new branch in the network, placing it after inside the variable order of the model-checker appears to complexify the model, and lead to an increased computing time. The results of Force \enquote{Pre-Post} are following the same pattern in most cases. Using this enhanced algorithm sometimes gives better results and prove that it is one parameter that might influence the quality of the order.
 
-Second, the size of the SDD will highly depend on the number of branches inside of it. It appears intuitive that having more branches in a graph usually increases its size. That is why inserting the operations involving less variables at the top of the order (and therefore at the top of the diagram) will produce less branches than if the \enquote{heavy} operations were higher in the graph. This reduces the number of possible paths in the SDD and thus reduce the computation time. 
-This observation is supported by the results of Force \enquote{Order Edges} and \enquote{Order Edges Reversed}. The first one places the hyper-edges with less variables at the top, whereas the other one places them at the bottom of the graph. It can be gathered from the results that this statement is true in many cases, where the second one would worsen the computing time by orders of magnitude. We have therefore uncovered one more parameter directly alterating the computation time..
+Second, the size of the SDD will highly depend on the number of branches inside of it. It appears intuitive that having more branches in a graph usually increases its size. That is why inserting the operations involving less variables at the top of the order (and therefore at the top of the diagram) will produce less branches than if the \enquote{heavy} operations were higher in the graph. This reduces the number of possible paths in the SDD and thus reduce the computation time.
 
-However, in some cases, placing the hyper-edges with many variables at the top has yielded better results. Likewise, placing the first variables of the Petri network in the same order inside the SDD may sometimes prove to be the wrong idea. We have been as of now unable to explain these results that seem to contravene the idea we have of the SDD. That is why further studies must to be conducted to broaden our understanding of the SDD and the way they affect the model-checker. 
+However, in some cases, placing the hyper-edges with many variables at the top has yielded better results. Likewise, placing the first variables of the Petri network in the same order inside the SDD may sometimes prove to be the wrong idea. We have been as of now unable to explain these results that seem to contravene the idea we have of the SDD. That is why further studies must be conducted to broaden our understanding of the SDD and the way they affect the model-checker. 
 
 \newpage
 \section*{Conclusion}
@@ -464,9 +470,9 @@ The Hierarchical Set Decision Diagrams have been designed to be a fast and effic
 
 After more than 120 hours of benchmarking, we can confirm that Force takes very little time to be applied and seldom deteriorates the variable order. However, some cases remain where neither the initial order, nor the Force order lead to an acceptable computing time. The parameters influencing the quality of the order could not be identified, and a better understanding of these parameters would surely lead to a more efficient version of Force. Future studies should aim at determining why certain models reject the use of Force, and what could be done to improve this algorithm.
 
-A solution might also be to try and imagine new algorithms, but since SDDs are so difficult to grasp, it will be some time before we obtain better results than with Force. The genetic algorithm we designed works quite well in many cases, but worsen the order in many others. This is why it is crucial to have various algorithms available, in order to apply the one suited for the situation.
+A solution might also be to try and imagine new algorithms, but since SDDs are so difficult to grasp, it will be some time before we obtain better results than with Force. The genetic algorithm we designed works quite well in many cases, but worsen the order in others. This is why it is crucial to have various algorithms available, in order to apply the one suited for the situation.
 
-The way the algorithms speed up the model-checker is not yet fully understood, and further work should explore the different enhancements that could be done on the previous algorithms, and list the various parameters that influence the efficiency of the sorting algorithms. Such studies would certainly require more precise data on the models used and their specificity.
+The way the algorithms speed up the model-checker is not yet fully understood, and further work should explore the different enhancements that could be done on the previous algorithms, and list the various parameters that influence the efficiency of the sorting algorithms. Such studies would certainly require more precise data on the models used and their specificities.
 \printbibliography
 
 \end{document}
