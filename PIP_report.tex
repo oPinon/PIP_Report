@@ -155,7 +155,7 @@ On the left are the hyperedges that connect the different variables. The further
   \label{force_plot}
 \end{figure}
 
-Figure~\ref{force_plot} shows the evolution of the $span$ during Force's execution. In most of the 162 cases the span reaches its minimal value within the first ten iterations, but there are a dozen cases that behave in another way: they first reach a minimal value, but then the span increases to finally stabilize at a higher value. There is also cases where the span settles in a periodic evolution. Considering those two cases, stopping Force as soon as the span stops decreasing might seem like the best idea, but there is one last case: the span might increase for a while, but then decrease to reach a final, much lower, value.
+The above figure~\ref{force_plot} shows the evolution of the $span$ during Force's execution. In most of the 162 cases the span reaches its minimal value within the first ten iterations, but there are a dozen cases that behave in another way: they first reach a minimal value, but then the span increases to finally stabilize at a higher value. There is also cases where the span settles in a periodic evolution. Considering those two cases, stopping Force as soon as the span stops decreasing might seem like the best idea, but there is one last case: the span might increase for a while, but then decrease to reach a final, much lower, value.
 The solution we finally chose was to terminate Force when the span had stayed higher than its minimal value for 100 iterations and establish the final order as the one corresponding to the minimal span reached during these iterations.
 
 \begin{figure}[H]
@@ -185,7 +185,6 @@ The data that fits best its regression is ~\ref{time_vs_(var+edges)} with a corr
 
 Because the model-checker we use is based on Petri networks, there is another information we can use to build the order. As a matter of fact, the links (also called \enquote{transitions}) represent operations used on the variables to build the graph, and therefore have a direction. It means that a variable depends on another, and the link between variables can be unidirectional or bidirectional. It seems intuitive to put a variable after the ones it depends on. A variable others depend on is called \enquote{Pre}, a variable depending on another is a \enquote{Post}, and a bidirectional link involves Pre-Post variables. Using that information before each iteration of the algorithm proved to help decrease the span further in some cases.
 This operation can be done as follows :
-%TODO explain why this can enhance the computation
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -294,34 +293,34 @@ All these variables allow the algorithm to be extremely flexible to the needs of
 
 \chapter{Experimental results}
 
-\section{Force algorithm}
+\section{Overall results}
 
-The Force algorithm and the enhanced version of Force have been tested using some of the most common computer science problems. In each case, we prompted the time needed to apply the model checker and get a solution.
+The different heuristics have been tested using some of the most common computer science problems. In each case, we prompted the time needed to apply the model checker and get a solution. The detailed results are shown later on in section \ref{all_results} but here is a short description of what they gave.
 
-\begin{figure}[!h]
-  \begin{center}
-    \includegraphics[scale=0.33]{images/force_results.jpg}
-    \caption{Experimental results using the Force algorithm and its enhanced version}
-    \label{force_results}
-  \end{center}
-\end{figure}
+Over the 159 models we tested, there are 92 models that we have been able to solve with at least one heuristic. Even though this only represents 58\% of all the models, this is still a very neat improvement compared to the 36\% that the model-checker was able to solve from the natural order.
+Below, in figure \ref{success_percentage}, is displayed the percentage of success of each algorithm we tested. Note that the percentages are calculated over the 92 models we have been able to solve, which mean that an heuristic that would reach 100\% here would solve any of the models another heuristic can solve. However this is not the case for any of those we tested : even though the \enquote{Force} heuristic gives the best results, there are some cases that we were able to solve through only one heuristc, such as \enquote{Order-Edges}.
 
 \begin{figure}[!h]
   \begin{center}
   \begin{tikzpicture}
   \begin{axis}[
     ybar stacked,
-    bar width=15pt,
+    bar width=10pt,
+    width = \textwidth,
+    height = 0.5\textwidth,
     nodes near coords,
     enlargelimits=0.2,
     ylabel={ Percentage of success },
     symbolic x coords = {
       Natural,
+      Short iteration,
+      Other genetic algorithms,
       Force,
       Order-Edges,
       Order-Edges(Reversed),
       Order-Edges+Pre-Post,
       Order-Edges(Reversed)+Pre-Post,
+      Order-Edges(Reversed)+Pre-Post(longer),
       Pre-Post,
       Order-Edges2,
       Order-Edges2(reversed)
@@ -330,23 +329,25 @@ The Force algorithm and the enhanced version of Force have been tested using som
     x tick label style={rotate=45,anchor=east},
     ]
 \addplot+[ybar] plot coordinates {
-  (Natural,27)
-  (Force,65)
-  (Order-Edges,58)
-  (Order-Edges(Reversed),58)
-  (Order-Edges+Pre-Post,65)
-  (Order-Edges(Reversed)+Pre-Post,65)
-  (Pre-Post,62)
-  (Order-Edges2,38)
-  (Order-Edges2(reversed),27)
+  (Natural,63)
+  (Short iteration,63)
+  (Other genetic algorithms,63)
+  (Force,90)
+  (Order-Edges,87)
+  (Order-Edges(Reversed),87)
+  (Order-Edges+Pre-Post,89)
+  (Order-Edges(Reversed)+Pre-Post,88)
+  (Order-Edges(Reversed)+Pre-Post(longer),90)
+  (Pre-Post,89)
+  (Order-Edges2,68)
+  (Order-Edges2(reversed),63)
 };
 \end{axis}
 \end{tikzpicture}
 \end{center}
+\label{success_percentage}
 \caption {Percentage of success for each algorithm, over the cases where at least one algorithm succeeded}
 \end{figure}
-
-The tests have shown that although Force does give better results in many cases, the most significant results are achieved with the enhanced version of Force. For the House Construction 010 problem, computation has been improved fourfold, and it gives similar results in many cases. However, there are still cases where the computing time has not been improved. It appears that if the order is already considered \enquote{good}, the algorithm tends to worsen it. Further work will determine the reasons behind such behavior.
 
 \section{Genetic algorithm}
 
@@ -412,7 +413,7 @@ It can be first noticed that no order of magnitude is gained nor lost due to the
     \hspace*{-0.8cm}
     \scalebox{0.8}{
       \begin{tabular}{lccc}
-        Algorithm           & Number & Description \\
+        Algorithm           & Number & Description paragraph \\
         Natural             & 1      &             \\
         Long iteration      & 2      & ~\ref{genetic_configuration} \\
         Long & 3 & ~\ref{genetic_configuration} \\
@@ -427,8 +428,8 @@ It can be first noticed that no order of magnitude is gained nor lost due to the
         Order-Edges reversed and Pre-Post & 12 & ~\ref{order_edges} \\
         Order-Edges reversed and Pre-Post with slightly more iterations & 13 & ~\ref{order_edges} \\
         Pre-Post & 14 & ~\ref{order-pre-post} \\
-        Order-Edges 2 & 15 & ~\ref{} \\
-        Order-Edges 2 reversed & 16 & ~\ref{}
+        Order-Edges 2 & 15 & ~\ref{order_edges} \\
+        Order-Edges 2 reversed & 16 & ~\ref{order_edges}
       \end{tabular}
     }
     \label{algorithms}
