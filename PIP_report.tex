@@ -11,6 +11,7 @@
 \usepackage{verbatim}
 \usepackage{subfigure}
 \usepackage{hyperref}
+\usepackage{csvsimple}
 \usepackage[noend]{algpseudocode}
 \usepackage{algorithm}
 \usepackage[english=british]{csquotes}
@@ -345,6 +346,25 @@ The tests have shown that although FORCE does give better result in many cases, 
 \section{Genetic algorithm}
 
 Like Force, the genetic algorithm has been tested in the same cases, with the same computer, so that the benchmarks can be compared.
+
+\begin{table}[!h]
+  \begin{center}
+    \label{genetic_results}
+    \caption{Genetic algorithm results, compared to the natural order (in percentages)}
+    \hspace*{-0.52cm}
+    \scalebox{0.6}{
+      \begin{tabular}{l|c|c|c|c|c|c|c}
+        \bfseries Model & \bfseries Natural & \bfseries Short & \bfseries Short iteration & \bfseries Medium & \bfseries Medium iteration & \bfseries Long & \bfseries Long iteration
+        \csvreader[head to column names]{csv_files/genetic_results.csv}{}
+        {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv&\csvcolvi&\csvcolvii&\csvcolviii}
+      \end{tabular}
+    }
+  \end{center}
+\end{table}
+
+After running the benchmark, it appeared that the genetic algorithm only finishes the calculation in the cases where the natural order finishes. As the algorithm does not change the nature of the model, and does not use a particular representation like Force, it seems only logical that the percentage of success is kept at the same level.
+
+
 
 \section{Comparison of the two algorithms}
 
