@@ -43,9 +43,9 @@
 \section*{Introduction} %TODO : PUT IT WITHOUT THE NUMBERS !!!
 
 Model checking consists in testing a particular model of a given system, comprehensively and automatically in order to verify if it meets a given specification. This can be achieved by generating all the possible states of a system, known as the state space. This kind of testing is especially interesting in aeronautics as it allows engineers to find all the possible flaws of a system. This method is best implemented using Computer Science as model checking involves simple but numerous operations.
-\\\\
+
 However, when the system increases in complexity, because of the combinatorial explosion, the quantity of data to deal with can reach overwhelming amounts. This is why alternative methods have been developed, and the one we have been working on is the Hierarchical Set Decisions Diagram (SDD), which consists in reducing the size of the representation of the state space by using symetries, patterns, by merging the parts that lead to the same results and summarizing it in a graph called SDD. We have based our work on Pr. Hamez’s C++ Model-Checking library called \enquote{\textit{pnmc}} \cite{pnmc}. The idea was to find a pre-processing algorithm that would speed up the computing done by \enquote{\textit{pnmc}}. An extremely efficient way to improve this computing is to find a better order for the variables used by the model checker, as it can reduce its computing time by orders of magnitude. The aim here is to design an algorithm that will find the optimal variable order, thus leading to the fastest computing time possible.
-\\\\
+
 We will first introduce the main notions required to understand how a model checker and decision diagrams work. We then started our work by trying to adapt and implement an algorithm called Force, which was originally designed for Binary Decision Diagrams where variables can only be 1 or 0. Third, we laid the basis of a brand new algorithm, based on much simpler matrices. We then ran tests to verify that the model checker was faster with a pre-processing algorithm than without, and we will present the results of these tests. Finally, several parameters influencing the quality of the order have been identified and will be presented.
 
 \chapter{Model Checking and Decision Diagrams}
