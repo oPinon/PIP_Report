@@ -42,17 +42,17 @@
 
 \section*{Introduction} %TODO : PUT IT WITHOUT THE NUMBERS !!!
 
-Model checking is about testing a particular model of a given system, comprehensively and automatically in order to check if it meets a given specification. This can be achieved by generating all the possible states of a system, known as the state space. This kind of testing is especially interesting in aeronautics, as it allows engineers to find all the possible flaws of a system. This method is best implemented using Computer Science, as model checking involves simple but numerous operations.
+Model checking consists in testing a particular model of a given system, comprehensively and automatically in order to verify if it meets a given specification. This can be achieved by generating all the possible states of a system, known as the state space. This kind of testing is especially interesting in aeronautics as it allows engineers to find all the possible flaws of a system. This method is best implemented using Computer Science as model checking involves simple but numerous operations.
 \\\\
-However, when the system increases in complexity, because of the combinatorial explosion, the quantity of data to deal with can reach overwhelming amounts. This is why alternative methods have been developed, and the one we have been working on is the Hierarchical Set Decisions Diagram, which consists in reducing the size of the representation of the state space by using symetries, patterns and by merging the parts that lead to the same results. We have based our work on Pr. Hamez’s C++ Model-Checking library called \enquote{\textit{pnmc}} \cite{pnmc}. The idea was to find a pre-processing algorithm that would speed up the computing done by \enquote{\textit{pnmc}}. An extremely efficient way to improve this computing is to find a good order for the variables used by the model checker, as it can reduce its computing time by orders of magnitude. The aim here is to design an algorithm that will find the optimal variable order, thus leading to the fastest computing time possible.
+However, when the system increases in complexity, because of the combinatorial explosion, the quantity of data to deal with can reach overwhelming amounts. This is why alternative methods have been developed, and the one we have been working on is the Hierarchical Set Decisions Diagram (SDD), which consists in reducing the size of the representation of the state space by using symetries, patterns, by merging the parts that lead to the same results and summarizing it in a graph called SDD. We have based our work on Pr. Hamez’s C++ Model-Checking library called \enquote{\textit{pnmc}} \cite{pnmc}. The idea was to find a pre-processing algorithm that would speed up the computing done by \enquote{\textit{pnmc}}. An extremely efficient way to improve this computing is to find a better order for the variables used by the model checker, as it can reduce its computing time by orders of magnitude. The aim here is to design an algorithm that will find the optimal variable order, thus leading to the fastest computing time possible.
 \\\\
-We will first introduce the main notions required to understand how a model checker and decision diagrams work. We then started our work by trying to adapt and implement an algorithm named Force, which was originally designed for Binary Decision Diagrams where variables can only be 0 or 1. Third, we ran tests to verify that the model checker was faster with Force than without, and we will present the results of these tests. Finally, we laid the basis of a brand new algorithm, based on much simpler matrices.
+We will first introduce the main notions required to understand how a model checker and decision diagrams work. We then started our work by trying to adapt and implement an algorithm called Force, which was originally designed for Binary Decision Diagrams where variables can only be 1 or 0. Third, we laid the basis of a brand new algorithm, based on much simpler matrices. We then ran tests to verify that the model checker was faster with a pre-processing algorithm than without, and we will present the results of these tests. Finally, several parameters influencing the quality of the order have been identified and will be presented.
 
 \chapter{Model Checking and Decision Diagrams}
 
 Various notions are required before even trying to explain the different techniques used to reduce computing time in a model checker.
 
-First and foremost, a system, may it be a plane, a program or a spaceship, can be represented by a set of variables which can have a variety of values (infinite or not). Take one of these variables and freeze its value : you can choose another one, and compute the different values it can assume, knowing the value of the first one. If you do that for each possible value of every single variable of the system, a graph can be drawn and each path in the graph (a line from top to bottom) represent one possible state of the system.
+First and foremost, a system, be it a plane, a program or a spaceship, can be represented by a set of variables which can have a variety of values (finite or not). Take one of these variables and freeze its value. Choose another variable and compute the different values it can assume, knowing the value of the first one. If this is done for each possible value of every single variable of the system, a graph can be drawn and each path in the graph (a line from top to bottom) represents one possible state of the system. This graph is then called a Decision Diagram. Its type (Hierarchical, Binary, etc) depends on the type of variables used.
 
 \begin{figure}[!h]
   \centering
@@ -61,11 +61,11 @@ First and foremost, a system, may it be a plane, a program or a spaceship, can b
   \label{basic_bdd}
 \end{figure}
 
-In figure~\ref{basic_bdd}, you can see the comprehensive Binary Decision Diagram (BDD) of the function :
+Figure~\ref{basic_bdd} shows the comprehensive Binary Decision Diagram (BDD) of the function :
 
 \[f(x_1,x_2,x_3) = \bar{x_1}\bar{x_2}\bar{x_3} + x_1x_2 + x_2x_3\]
 
-However, this BDD can easily be reduced by noticing that if both $x_1$ and $x_2$ equal 1, then $f(x_1, x_2, x_3)$ will equal 1 as well, no matter what value $x_3$ assumes. If the path leading to the same value of f (0 or 1) are also joined, the same BDD will look like that :
+However, this BDD can easily be reduced by noticing that if both $x_1$ and $x_2$ equal 1, then $f(x_1, x_2, x_3)$ will equal 1 as well, no matter what value $x_3$ assumes. If the path leading to the same value of f (0 or 1) are also joined together, the same BDD will appear as follows :
 
 \begin{figure}[!h]
   \centering
@@ -74,7 +74,7 @@ However, this BDD can easily be reduced by noticing that if both $x_1$ and $x_2$
   \label{compact_bdd}
 \end{figure}
 
-A noticable thing in this diagram is that if you change the order of the variables by switching $x_3$ and $x_1$, the size of the representation will increase greatly since you will not be able to keep track of the simplifications made above in figure~\ref{compact_bdd}. This phenomena can be highlighted in a second example, figure~\ref{reduction_bdd} where a rearrangement of the variables can lead to a much simpler BDD.
+What can be noticed in this diagram is that if the variable order is changed by switching $x_3$ and $x_1$, the size of the representation will increase greatly since it will not be possible to keep track of the simplifications made above in figure~\ref{compact_bdd}. This phenomena can be highlighted in a second example, figure~\ref{reduction_bdd} where a rearrangement of the variables can lead to a much simpler BDD.
 
 \begin{figure}[!h]
   \centering
@@ -88,17 +88,17 @@ A noticable thing in this diagram is that if you change the order of the variabl
   \label{reduction_bdd}
 \end{figure}
 
-It is therefore readily understandable that a model checker will have a lot less trouble checking the rearranged diagram on the right, rather than the one on the left. It will thus be faster and will prove less prone to making mistakes. The diagram used in our algorithm, the Hierarchical Set Decision Diagram (SDD), is slightly more complex as it allows links between variables to be SDDs themselves. However, the principle remains the same and if a method is found to order BDDs, is can be adapted to SDDs.
+It is therefore readily understandable that a model checker would spend less time checking the rearranged diagram on the right, compared to the one on the left. It would thus be faster and prove less prone to mistakes. The diagram used in our algorithm, the Hierarchical Set Decision Diagram (SDD), is slightly more complex as it allows links between variables to be SDDs themselves. However, the principle remains the same and if a method is found to order BDDs, is can be adapted to SDDs.
 
-In the case of tiny diagrams, a human can reorder it and let the computer handle the rest of the computation. However, for common systems, the number of variables can easily reach a thousand and more. It is then impossible for a person to even represent the diagram, making it that much more difficult to reduce its size, and considering that the state space of a system has no link whatsoever with the state space of another system, the automatic modification of the variables order seems challenging. One algorithm has nonetheless caught our attention : Force.
+In the case of small diagrams, a human can reorder it and let the computer handle the rest of the computation. However, for common systems, the number of variables can easily reach a thousand or more. It is then impossible for a person to even represent the diagram, making it that much more difficult to reduce its size; considering that the state space of a system has no link whatsoever with the state space of another system, the automatic modification of the variable order seems impossible. In our search to find one such algorithm, or one that would improve the computing time in most cases, an algorithm called Force caught our attention.
 
 \chapter{Force : A powerful algorithm that can easily be enhanced}
 
 \section{The basic version}
 
-Taking root in the natural laws of gravity, the Force algorithm has been described in \textit{FORCE : A Fast and Easy-To-Implement Variable-Ordering Heuristic} [3]. The algorithm itself is as simple as using forces of attraction between variables. The variables are ordered on a line, given a position, and are attracted to the variables they are linked to. The diagram will thus organize itself in a simpler way, and should be easier to deal with afterwards.
+Taking root in the natural laws of gravity, the Force algorithm is described in \textit{FORCE : A Fast and Easy-To-Implement Variable-Ordering Heuristic} [3]. The algorithm itself is as simple as to use forces of attraction between variables. The variables are ordered on a line, given a position, and are attracted to the variables they are linked to thanks to these attraction forces. The diagram will thus organize itself in a simpler way, and should be easier to deal with afterwards.
 
-First, the variables are defined, and then the hyperedges which represent the links between variables. The particularity of an hyperedge is that it can bind together more than 2 variables. At the beginning, the variables are given an initial position on a line, representing the initial order. After that, iterations are repeated until a suitable order is reached :
+First, the variables are defined, followed by the hyperedges which represent the links between variables. The particularity of a hyperedge is that it can bind together more than 2 variables. At the beginning, the variables are given an initial position on a line, representing the initial order. This initial order is given by the model which needs to be checked: a Petri network is parsed linearily, and the variables are given the position in which they have been parsed. After that, iterations are repeated until a suitable order is reached:
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -119,7 +119,7 @@ First, the variables are defined, and then the hyperedges which represent the li
 \begin{itemize}
   \item $COG$ : mean value of the variables' positions the edge connects to.
   \item variable's new $position$ : mean value of the $COG$s of its connected edges.
-  \item $span$ : difference between the positions of the first and the last of an edge's variables (the ones that are the most apart from each other).
+  \item $span$ : difference between the positions of the first and the last variables of an edge (the ones that are the most apart from each other).
 \end{itemize}
 
 \begin{figure}[!h]
@@ -131,6 +131,8 @@ First, the variables are defined, and then the hyperedges which represent the li
 
 To determine the quality of an order and know when to stop, the algorithm computes the span of the order (figure~\ref{force_span}). It is the sum of the span of every hyperedge. Once the \enquote{length} of the order has settled, the algorithm is complete and gives the final order.
 
+In figure~\ref{force_span}, 4 variables linked by 3 hyperedges can be seen. In the first order, the hyperedges are long, and once reordered, they are shorter, meaning they have a lower span. The algorithm will not be able to find a better order, it will stop and give the optimal order.
+
 \begin{figure}[!h]
   \centering
   \includegraphics[scale=0.5]{images/representation_order.jpg}
@@ -138,12 +140,9 @@ To determine the quality of an order and know when to stop, the algorithm comput
   \label{order_graph}
 \end{figure}
 
-In figure~\ref{order_graph}, 4 variables linked by 3 hyperedges can be seen. In the first order, the hyperedges are long, and once reordered, they are shorter, meaning they have a lower span. The algorithm will not be able to find a better order, it will stop and give the optimal order.
+To help us in our work, we created a program to display the variable order. It particularly helps with finding symetries in a graph, or patterns that should be studied further. Figure~\ref{order_graph} shows a graphic output of that program, and represents an SDD.
 
-To help us in our work, we created a program to display the variable order. It particularly helps with finding symetries in a graph, or patterns that should be studied further.
-
-On the left are the hyperedges that connect the different variables. The further they are on the left, the higher their span is. On the right are the variables (known as places in this case, hence p1, p2, \ldots)
-
+On the left are the hyperedges that connect the different variables. The further they appear on the left, the higher their span. On the right are the variables (known as places in this case, hence p1, p2, etc)
 
 \section{Force's execution time and termination criteria}
 
@@ -156,7 +155,7 @@ On the left are the hyperedges that connect the different variables. The further
   \label{force_plot}
 \end{figure}
 
-In figure~\ref{force_plot} can be seen the evolution of the $span$ during Force's execution. In most of the 162 cases the span reaches its minimal value within the first ten iterations, but there are a dozen of cases that behaves in another way : they first reach a minimal value, but then the span increases to finally stabilize at a higher value. There is also cases where the span settles in a periodic evolution. Considering those two cases, stopping Force as soon as the span stops decreasing might seem like the best idea, but there is one last case : the span might increase for a while, but then decrease to reach a final, much lower, value.
+Figure~\ref{force_plot} shows the evolution of the $span$ during Force's execution. In most of the 162 cases the span reaches its minimal value within the first ten iterations, but there are a dozen cases that behave in another way: they first reach a minimal value, but then the span increases to finally stabilize at a higher value. There is also cases where the span settles in a periodic evolution. Considering those two cases, stopping Force as soon as the span stops decreasing might seem like the best idea, but there is one last case: the span might increase for a while, but then decrease to reach a final, much lower, value.
 The solution we finally chose was to terminate Force when the span had stayed higher than its minimal value for 100 iterations and establish the final order as the one corresponding to the minimal span reached during these iterations.
 
 \begin{figure}[H]
@@ -180,12 +179,12 @@ The solution we finally chose was to terminate Force when the span had stayed hi
 \caption{Duration of Force's execution (in ns) versus the samples' complexity, in a logarithmic scale.}
 \end{figure}
 
-The data that fits best its regression is ~\ref{time_vs_(var+edges)} with a correlation coefficient of R=0.993 and the model is $time({\mu}s)= {9.2}*x^{1.17}$. For example with one of the largest models that has $5*10^4$ variables and $5*10^4$ edges, the duration of Force is $6.1$ seconds and the equation gives an estimation of $6.5$s.
+The data that fits best its regression is ~\ref{time_vs_(var+edges)} with a correlation coefficient of R=0.993 and the model is $time({\mu}s)= {9.2}*x^{1.17}$. For example with one of the largest model that has $5*10^4$ variables and $5*10^4$ edges, the duration of Force is $6.1$ seconds and the equation gives an estimation of $6.5$s.
 
 \section{The PRE-POST enhancement}
 
-Because the Model-Checker we use is based on Petri Networks, there is another information we can use to build the order. As a matter of fact, the links (also called \enquote{transitions}) represent operations used on the variables to build the graph, and therefore have a direction. It means that a variable depends on another, and the link between variables can be unidirectional or bidirectional. It seems intuitive to put a variable after the ones it depends on. A variable others depend on is called PRE, a variable depending on a another is a POST, and a bidirectional link involves PRE-POST variables. Using that information before each iteration of the algorithm proved to help decrease the span further in some cases.
-This operation can be done as so :
+Because the model-checker we use is based on Petri networks, there is another information we can use to build the order. As a matter of fact, the links (also called \enquote{transitions}) represent operations used on the variables to build the graph, and therefore have a direction. It means that a variable depends on another, and the link between variables can be unidirectional or bidirectional. It seems intuitive to put a variable after the ones it depends on. A variable others depend on is called PRE, a variable depending on another is a POST, and a bidirectional link involves PRE-POST variables. Using that information before each iteration of the algorithm proved to help decrease the span further in some cases.
+This operation can be done as follows :
 %TODO explain why this can enhance the computation
 
 \begin{algorithm}
@@ -202,7 +201,7 @@ This operation can be done as so :
 \end{algorithmic}
 \end{algorithm}
 
-In theory, sorting the edges at the beginning allows the order not to be too much changed, while still forcing the transition types to be as much sorted as possible. Hence when processing an edge, we take the variables from all over and gather them at the edge's COG. Right after being processed, the edge has a minimal span; but because processing the next edges will also move the variables, it will progressivly be unmade. This is the reason why we start by applying it to the edges with the highest span, and end with those with the lowest. The edges we process first probably won't respect the rule because the future operations will unmake the first ones; however we want to make sure that the edges with the smallest span do respect it, and because they are processed last, they will end with a minimal span.
+In theory, sorting the edges at the beginning allows the order not to be changed too much, while still forcing the transition types to be as sorted as possible. Hence when processing an edge, we take the variables from all over and gather them at the edge's COG. Right after being processed, the edge has a minimal span; but because processing the next edges will also move the variables, it will progressively be unmade. This is the reason why we start by applying it to the edges with the highest span, and end with those with the lowest. The edges we process first probably won't respect the rule because the future operations will unmake the first ones; however we want to make sure that the edges with the smallest span do respect it, and because they are processed last, they will end with a minimal span.
 
 \section{Sorting the edges}
 
@@ -218,13 +217,13 @@ The last enhancement we tried was to order the edges according to their number o
 \end{algorithmic}
 \end{algorithm}
 
-This operation may reduce the model-checker's computing time because when operations are applied on a SDD to construct it, these operations propagate from the top ofthe diagram and then are repeated further in the diagram until they reach a certain criteria. ??????????????
+This operation may reduce the model-checker's computing time because when operations are applied on a SDD to construct it, these operations propagate from the top of the diagram and then are repeated further in the diagram until they reach a certain criteria. ??????????????
 
 \chapter{A genetic algorithm}
 
-Seeing what could be achieved with simple methods, we designed another algorithm based on matrices, the most widely used representation for problems in mathematics. The rationale was to speed up the calculations by simplifying the representation of the Hyper Edges.
+Seeing what could be achieved with relatively simple methods, we designed another algorithm based on matrices, the most widely used representation for problems in mathematics. The rationale was to speed up the calculations by simplifying the representation of the Hyper Edges.
 \\\\
-The principle is that a matrix will represent one model. The lines represent the variables of the model, thus the current variable order, and the columns represent the different operations (as know as the hyper edges) used to build the state space. If a variable is involved in a certain operation, a 1 is put at the corresponding line and column intersection. After having considered all the variables and their link to the hyper edges, the rest of the matrix is filled with zeros.
+The principle is that a matrix will represent one model. The lines represent the variables of the model, thus the current variable order, and the columns represent the different operations (as know as the hyper edges) used to build the state space. If a variable is involved in a certain operation, a 1 is inserted at the intersection of the corresponding line and column. After having considered all the variables and their link to the hyper edges, the rest of the matrix is filled with zeros (\ref{example_matrix}).
 
 \begin{figure}[!h]
   \centering
@@ -241,8 +240,9 @@ The principle is that a matrix will represent one model. The lines represent the
   \label{example_matrix}
 \end{figure}
 
-As opposed to Force, this representation of a model requires a new way to determine the end of the algorithm. As a matter of fact, the span cannot be computed the same way as before. In the following paragraphs, the term \enquote{\it{norm}} will be used to designate the value representing whether an order will be considered \enquote{good} or not. It is the equivalent of the span. This norm can be computed as follows:
-For each column, the number of 0 between the first and last $1$ of that column is determined. After that, the results from each column are added together, and give the norm of the matrix. It can be seen as the \enquote{area} of the matrix. The lower the area, the more separated the variables are, and just as it was intuited for Force, the longer the model checking should be.
+As opposed to Force, this representation of a model requires a new way to determine the end of the algorithm. As a matter of fact, the span cannot be computed the same way as before. In the following paragraphs, the term \enquote{\it{norm}} will be used to designate the value representing whether an order will be considered \enquote{good} or not. It is the equivalent of the span. 
+This norm can be computed as follows:
+For each column, the number of $0$ between the first and last $1$ of that column is determined. After that, the results from each column are added together, and give the norm of the matrix. It can be seen as the \enquote{area} of the matrix. The lower the area, the more separated the variables will be, and just as it was intuited for Force, the longer the model checking should be.
 
 Like before, the only available action on the model is to change the variable order and this is done here by switching two lines together. Several versions of the algorithm were tested, trying various techniques to reduce the norm, unfortunately none has proven significantly useful so far. 
 
@@ -262,23 +262,23 @@ We started by trying to find a way, given a random binary matrix, to get the one
 \end{algorithmic}
 \end{algorithm}
 
-Although this algorithm works satisfactorily for small matrices, \enquote{real} models contain thousands of variables, and a switch that lowers the norm of a single column willmost certainly increase the norm of a hundred other columns.
-After several attempts at finding an algorithm that worked in every case, it became increasingly clear that finding one such algorithm would not be easy, and would take a great amount of time.
+Although this algorithm works satisfactorily for small matrices, complex models contain thousands of variables, and a switch that lowers the norm of a single column will most certainly increase the norm of a hundred others.
+After several attempts at finding an algorithm that worked in every case, it became increasingly clear that finding one such algorithm would not be easy, and may not even be possible.
 
-Therefore, we decided another approach, that could be easily implemented and which would certainly wield acceptable results : a genetic algorithm. 
+Therefore, we decided another approach, that could be easily implemented and which would certainly yield acceptable results : a genetic algorithm. 
 
 The algorithm consists in 3 distinct phases :
 
 \begin{itemize}
-  \item Initialization : a set of matrices is created from the original matrix, and are created by switching 2 rows at random.
+  \item Initialization : a set of matrices is created from the original matrix, which are created by switching 2 rows at random.
   \item Mutation : from each matrix in the aforementioned set, a certain amount of matrices is created once again, thus creating a pool of matrices.
-  \item Selection : this pool is then sorted from the lowest to the greatest norm, and a few of the best matrices are selected to act as the set of the next mutation.
+  \item Selection : this pool is then sorted from the lowest to the greatest norm, and a few of the best matrices are selected to act as the set for the next mutation.
 \end{itemize}
 
-The last two phases are repeated until the end. And what is particularly interesting with this algorithm, is that the longer it is run, the better the results will be. This way, the algorithm can be adjusted according to the time available and the expected results. The algorithm will stop after all the iterations have been completed.
-After all the iterations have been completed, the best matrix in the pool is selected, and by tracing back the different rows switched, the new order is created.
+The last two phases are repeated until the end. And what is particularly interesting with this algorithm is that the longer it is run, the better the results. This way, the algorithm can be adjusted according to the time available and the expected results. The algorithm will stop after all the iterations have been completed.
+After the end, the best matrix in the pool is selected, and by tracing back the different rows switched, the new order is created.
 
-In order to chose the amount of matrices to create, 4 variables must be given to the algorithm :
+In order to choose the amount of matrices to create, 4 variables must be given to the algorithm :
 
 \begin{itemize}
   \item $INITIAL\_POPULATION$ : the initial number of matrices created from the original one.
@@ -340,19 +340,36 @@ The Force algorithm and the enhanced version of Force have been tested using som
 \end{axis}
 \end{tikzpicture}
 \end{center}
-\caption {Percentage of success of each algorithm, over the cases where at least one algorithm succeeded}
+\caption {Percentage of success for each algorithm, over the cases where at least one algorithm succeeded}
 \end{figure}
 
-The tests have shown that although Force does give better result in many cases, the most significant results are achieved with the enhanced version of Force. For the House Construction 010 problem, computation has been improved fourfold, and it gives similar results in many cases. However, the computation time has not been improved in every case. It appears that if the order is already considered \enquote{good}, the algorithm tends to worsen it. Further work will determine the reasons behind such behavior.
+The tests have shown that although Force does give better results in many cases, the most significant results are achieved with the enhanced version of Force. For the House Construction 010 problem, computation has been improved fourfold, and it gives similar results in many cases. However, there are still cases where the computing time has not been improved. It appears that if the order is already considered \enquote{good}, the algorithm tends to worsen it. Further work will determine the reasons behind such behavior.
 
 \section{Genetic algorithm}
+
+In addition to the natural order, 6 different configurations have been tested, summarized in the following table:
+
+\begin{table}[!h]
+  \begin{center}
+    \hspace*{-0.8cm}
+    \scalebox{0.8}{
+      \begin{tabular}{lcccccc}
+        Configuration       & Short & Medium & Long & Short-iteration & Medium-iteration & Long-iteration \\
+        INITIAL\_POPULATION & 40    & 40     & 40   & 40              & 40               & 40             \\
+        ITERATION\_NUMBER   & 20    & 100    & 200  & 100             & 200              & 400            \\
+        MUTATION\_SIZE      & 20    & 40     & 50   & 20              & 20               & 20             \\
+        SELECTION\_SIZE     & 10    & 5      & 2    & 3               & 3                & 3             
+      \end{tabular}
+    }
+    \label{genetic_configuration}
+    \caption{Variables used for the different results}
+  \end{center}
+\end{table}
 
 Like Force, the genetic algorithm has been tested in the same cases, with the same computer, so that the benchmarks can be compared.
 
 \begin{table}[!h]
   \begin{center}
-    \label{genetic_results}
-    \caption{Genetic algorithm results, compared to the natural order (in percentages)}
     \hspace*{-0.52cm}
     \scalebox{0.6}{
       \begin{tabular}{l|c|c|c|c|c|c|c}
@@ -361,12 +378,14 @@ Like Force, the genetic algorithm has been tested in the same cases, with the sa
         {\\\hline\csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv&\csvcolvi&\csvcolvii&\csvcolviii}
       \end{tabular}
     }
+    \label{genetic_results}
+    \caption{Experimental results using the genetic algorithm, compared to the natural order (in percentages)}
   \end{center}
 \end{table}
 
-After running the benchmark, it appeared that the genetic algorithm only finishes the calculation in the cases where the natural order finishes. As the algorithm does not change the nature of the model, and does not use a particular representation like Force, it seems only logical that the percentage of success is kept at the same level.
+After running the benchmark, it appeared that the genetic algorithm only finishes the calculation in the cases where the natural order finishes. As the algorithm does not change the nature of the model, and does not use a particular representation like Force and the hyper-edges, it seems only logical that the percentage of success is kept at the same level.
 
-It can be first noticed that no order of magnitude is gained nor lost due to the algorithm. The best that was achieved was cutting the computing time by half in one case. However, there are still many cases in which the genetic algorithm worsen the order in a way that is not fully understood yet. From that fact can be deduced that just as we had to take more parameters into account for Force, the quality of the order is not entirely dependent on the norm of the matrix used to represent the model. Therefore, a future work would consist in finding the various parameters that influence the order, and implement them in a new algorithm that may yield better results
+It can be first noticed that no order of magnitude is gained nor lost due to the algorithm. The best that was achieved was cutting the computing time by half. However, there are still many cases in which the genetic algorithm worsen the order in a way that is not fully understood yet. From that fact can be deduced that just as we had to take more parameters into account for Force, the quality of the order is not entirely dependent on the norm of the matrix used to represent the model. Therefore, a future work would consist in finding the various parameters that influence the order, and implement them in a new algorithm that may yield better results.
 
 \section{Comparison of the two algorithms}
 
