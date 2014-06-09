@@ -95,7 +95,7 @@ In the case of small diagrams, a human can reorder it and let the computer handl
 
 \section{The basic version}
 
-Taking root in the natural laws of gravity, the Force algorithm is described in \textit{FORCE : A Fast and Easy-To-Implement Variable-Ordering Heuristic} [3]. The algorithm itself is as simple as to use forces of attraction between variables. The variables are ordered on a line, given a position, and are attracted to the variables they are linked to thanks to these attraction forces. The diagram will thus organize itself in a simpler way, and should be easier to deal with afterwards.
+Taking root in the natural laws of gravity, the Force algorithm is described in \textit{FORCE : A Fast and Easy-To-Implement Variable-Ordering Heuristic} \cite{force}. The algorithm itself is as simple as to use forces of attraction between variables. The variables are ordered on a line, given a position, and are attracted to the variables they are linked to thanks to these attraction forces. The diagram will thus organize itself in a simpler way, and should be easier to deal with afterwards.
 
 First, the variables are defined, followed by the hyperedges which represent the links between variables. The particularity of a hyperedge is that it can bind together more than 2 variables. At the beginning, the variables are given an initial position on a line, representing the initial order. This initial order is given by the model which needs to be checked: a Petri network is parsed linearily, and the variables are given the position in which they have been parsed. After that, iterations are repeated until a suitable order is reached:
 
@@ -473,6 +473,23 @@ After more than 120 hours of benchmarking, we can confirm that Force takes very 
 A solution might also be to try and imagine new algorithms, but since SDDs are so difficult to grasp, it will be some time before we obtain better results than with Force. The genetic algorithm we designed works quite well in many cases, but worsen the order in others. This is why it is crucial to have various algorithms available, in order to apply the one suited for the situation.
 
 The way the algorithms speed up the model-checker is not yet fully understood, and further work should explore the different enhancements that could be done on the previous algorithms, and list the various parameters that influence the efficiency of the sorting algorithms. Such studies would certainly require more precise data on the models used and their specificities.
-\printbibliography
+
+\begin{thebibliography}{1}
+
+  \bibitem{pnmc} Pr. Alexandre Hamez \enquote{\em pnmc: A small Petri net model checker using Hierarchical Set Decision Diagrams} https://github.com/ahamez/pnmc October 2013
+
+  \bibitem{libsdd} Pr. Alexandre Hamez \enquote{\em libsdd: A generic C++ library for Hierarchical Set Decision Diagrams} https://github.com/ahamez/libsdd September 2012
+
+  \bibitem{force} Aloul, Fadi A., Igor L. Markov, and Karem A. Sakallah. \enquote{\em FORCE: a fast and easy-to-implement variable-ordering heuristic.} Proceedings of the 13th ACM Great Lakes symposium on VLSI. ACM (2003).
+
+  \bibitem{neighborhood} Panda, Shipra, and Fabio Somenzi. \enquote{\em Who are the variables in your neighborhood.} IEEE/ACM International Conference on Computer-Aided Design: digest of technical papers (1995) p74-77.
+
+  \bibitem{static_heuristics} Rice, Michael, and Sanjay Kulhari. \enquote{\em A Survey of Static Variable Ordering Heuristics for Efficient BDD/MDD Construction.} n.d.
+
+  \bibitem{graph_draw_small} Hu, Yifan. \enquote{\em Efficient, high-quality force-directed graph drawing.} Mathematica Journal 10.1 (2005): p37-71.
+
+  \bibitem{bool_bdd} Bryant, Randal E. \enquote{\em Graph-based algorithms for boolean function manipulation.} Computers, IEEE Transactions on 100.8 (1986): p677-691.
+
+  \end{thebibliography}
 
 \end{document}
