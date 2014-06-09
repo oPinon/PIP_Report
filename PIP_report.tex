@@ -118,6 +118,7 @@ First, the variables are defined, followed by the hyperedges which represent the
     \State {reorder the variables according to their position}
   \Until {the total $span$ stops decreasing}
 \EndFunction
+\label{force}
 \end{algorithmic}
 \end{algorithm}
 
@@ -180,31 +181,35 @@ The solution we finally chose was to terminate Force when the span had stayed hi
 
 The data that fits best its regression is ~\ref{time_vs_(var+edges)} with a correlation coefficient of R=0.993 and the model is $time({\mu}s)= {9.2}*x^{1.17}$. For example with one of the largest model that has $5*10^4$ variables and $5*10^4$ edges, the duration of Force is $6.1$ seconds and the equation gives an estimation of $6.5$s.
 
-\section{The PRE-POST enhancement}
+\section{The Pre-Post enhancement}
 
-Because the model-checker we use is based on Petri networks, there is another information we can use to build the order. As a matter of fact, the links (also called \enquote{transitions}) represent operations used on the variables to build the graph, and therefore have a direction. It means that a variable depends on another, and the link between variables can be unidirectional or bidirectional. It seems intuitive to put a variable after the ones it depends on. A variable others depend on is called PRE, a variable depending on another is a POST, and a bidirectional link involves PRE-POST variables. Using that information before each iteration of the algorithm proved to help decrease the span further in some cases.
+Because the model-checker we use is based on Petri networks, there is another information we can use to build the order. As a matter of fact, the links (also called \enquote{transitions}) represent operations used on the variables to build the graph, and therefore have a direction. It means that a variable depends on another, and the link between variables can be unidirectional or bidirectional. It seems intuitive to put a variable after the ones it depends on. A variable others depend on is called \enquote{Pre}, a variable depending on another is a \enquote{Post}, and a bidirectional link involves Pre-Post variables. Using that information before each iteration of the algorithm proved to help decrease the span further in some cases.
 This operation can be done as follows :
 %TODO explain why this can enhance the computation
 
 \begin{algorithm}
 \begin{algorithmic}[1]
-\Function {Order PRE-POST}{$variables$, $edges$}
+\Function {Order Pre-Post}{$variables$, $edges$}
   \State {compute the edges' COGs}
   \State {sort the $edges$ to have the ones with the highest span at the beginning} %TODO: this is actually order_pre_post reversed
   \ForAll{$edges$}
-    \State {sort the $variables$ in order to have the $PRE$, then the $PRE-POST$ and finally the $POST$}
+    \State {sort the $variables$ in order to have the $Pre$, then the $Pre-Post$ and finally the $Post$}
     \State {place these $variables$ in that order around the edge's $COG$}
   \EndFor
   \State {compute the new order according to the $variables$' positions}
 \EndFunction
+\label{order-pre-post}
 \end{algorithmic}
 \end{algorithm}
+
+During our testing, when we used the \enquote{Pre-Post} heuristic, this function was called before each of Force's iterations.
 
 In theory, sorting the edges at the beginning allows the order not to be changed too much, while still forcing the transition types to be as sorted as possible. Hence when processing an edge, we take the variables from all over and gather them at the edge's COG. Right after being processed, the edge has a minimal span; but because processing the next edges will also move the variables, it will progressively be unmade. This is the reason why we start by applying it to the edges with the highest span, and end with those with the lowest. The edges we process first probably won't respect the rule because the future operations will unmake the first ones; however we want to make sure that the edges with the smallest span do respect it, and because they are processed last, they will end with a minimal span.
 
 \section{Sorting the edges}
 
-The last enhancement we tried was to order the edges according to their number of variables :
+The last enhancement we tried was to order the edges according to their number of variables. The idea was to gather the edges with the highest number of variables on one side of the order, either the beginning or the end : we experimented with both. Applying this can be done with a simple function, described below~\ref{order_edges} which can be called before applying Force. During our testing, the normal version of Order-Edges sets the ones with the most variables at the beginning of the order, while the \enquote{reversed} version sets them at the end.
+Finally, we tried another version called \enquote{Order-Edges 2} where this function is not called at the beginning of Force, but before each of its iterations.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -212,11 +217,10 @@ The last enhancement we tried was to order the edges according to their number o
   \State {do a stable sort of the $edges$ according to the number of variables they connect to}
   \State {compute the $edges$' $COG$s according to that order}
   \State {compute the variables' new positions according to the $edges$' $COG$s}
+  \label{order_edges}
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
-
-This operation may reduce the model-checker's computing time because when operations are applied on a SDD to construct it, these operations propagate from the top of the diagram and then are repeated further in the diagram until they reach a certain criteria. ??????????????
 
 \chapter{A genetic algorithm}
 
@@ -319,8 +323,8 @@ The Force algorithm and the enhanced version of Force have been tested using som
       Order-Edges+Pre-Post,
       Order-Edges(Reversed)+Pre-Post,
       Pre-Post,
-      Force2,
-      Force3
+      Order-Edges2,
+      Order-Edges2(reversed)
     },
     xtick=data,
     x tick label style={rotate=45,anchor=east},
@@ -333,8 +337,8 @@ The Force algorithm and the enhanced version of Force have been tested using som
   (Order-Edges+Pre-Post,65)
   (Order-Edges(Reversed)+Pre-Post,65)
   (Pre-Post,62)
-  (Force2,38)
-  (Force3,27)
+  (Order-Edges2,38)
+  (Order-Edges2(reversed),27)
 };
 \end{axis}
 \end{tikzpicture}
@@ -400,6 +404,35 @@ It can be first noticed that no order of magnitude is gained nor lost due to the
     }
     \label{all_results}
     \caption{Experimental results (in percentages)}
+  \end{center}
+\end{table}
+
+\begin{table}[!h]
+  \begin{center}
+    \hspace*{-0.8cm}
+    \scalebox{0.8}{
+      \begin{tabular}{lccc}
+        Algorithm           & Number & Description \\
+        Natural             & 1      &             \\
+        Long iteration      & 2      & ~\ref{genetic_configuration} \\
+        Long & 3 & ~\ref{genetic_configuration} \\
+        Medium iteration & 4 & ~\ref{genetic_configuration} \\
+        Medium & 5 & ~\ref{genetic_configuration} \\
+        Short iteration & 6 & ~\ref{genetic_configuration} \\
+        Short & 7 & ~\ref{genetic_configuration} \\
+        Force & 8 & ~\ref{force} \\
+        Order-Edges & 9 & ~\ref{order_edges} \\
+        Order-Edges and Pre-Post & 10 & ~\ref{order_edges} \\
+        Order-Edges reversed & 11 & ~\ref{order_edges} \\
+        Order-Edges reversed and Pre-Post & 12 & ~\ref{order_edges} \\
+        Order-Edges reversed and Pre-Post with slightly more iterations & 13 & ~\ref{order_edges} \\
+        Pre-Post & 14 & ~\ref{order-pre-post} \\
+        Order-Edges 2 & 15 & ~\ref{} \\
+        Order-Edges 2 reversed & 16 & ~\ref{}
+      \end{tabular}
+    }
+    \label{algorithms}
+    \caption{List of the tested algorithms}
   \end{center}
 \end{table}
 
