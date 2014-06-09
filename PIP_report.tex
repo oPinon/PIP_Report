@@ -93,7 +93,7 @@ In the case of small diagrams, a human can reorder it and let the computer handl
 
 \chapter{Force : A powerful algorithm that can easily be enhanced}
 
-\section{The basic version}
+\section{The basic version} \label{basic_force}
 
 Taking root in the natural laws of gravity, the Force algorithm is described in \textit{FORCE : A Fast and Easy-To-Implement Variable-Ordering Heuristic} [3]. The algorithm itself is as simple as to use forces of attraction between variables. The variables are ordered on a line, given a position, and are attracted to the variables they are linked to thanks to these attraction forces. The diagram will thus organize itself in a simpler way, and should be easier to deal with afterwards.
 
@@ -181,7 +181,7 @@ The solution we finally chose was to terminate Force when the span had stayed hi
 
 The data that fits best its regression is ~\ref{time_vs_(var+edges)} with a correlation coefficient of R=0.993 and the model is $time({\mu}s)= {9.2}*x^{1.17}$. For example with one of the largest model that has $5*10^4$ variables and $5*10^4$ edges, the duration of Force is $6.1$ seconds and the equation gives an estimation of $6.5$s.
 
-\section{The Pre-Post enhancement}
+\section{The Pre-Post enhancement} \label{sec:pre_post}
 
 Because the model-checker we use is based on Petri networks, there is another information we can use to build the order. As a matter of fact, the links (also called \enquote{transitions}) represent operations used on the variables to build the graph, and therefore have a direction. It means that a variable depends on another, and the link between variables can be unidirectional or bidirectional. It seems intuitive to put a variable after the ones it depends on. A variable others depend on is called \enquote{Pre}, a variable depending on another is a \enquote{Post}, and a bidirectional link involves Pre-Post variables. Using that information before each iteration of the algorithm proved to help decrease the span further in some cases.
 This operation can be done as follows :
@@ -205,7 +205,7 @@ During our testing, when we used the \enquote{Pre-Post} heuristic, this function
 
 In theory, sorting the edges at the beginning allows the order not to be changed too much, while still forcing the transition types to be as sorted as possible. Hence when processing an edge, we take the variables from all over and gather them at the edge's COG. Right after being processed, the edge has a minimal span; but because processing the next edges will also move the variables, it will progressively be unmade. This is the reason why we start by applying it to the edges with the highest span, and end with those with the lowest. The edges we process first probably won't respect the rule because the future operations will unmake the first ones; however we want to make sure that the edges with the smallest span do respect it, and because they are processed last, they will end with a minimal span.
 
-\section{Sorting the edges}
+\section{Sorting the edges} \label{sec:order_edges}
 
 The last enhancement we tried was to order the edges according to their number of variables. The idea was to gather the edges with the highest number of variables on one side of the order, either the beginning or the end : we experimented with both. Applying this can be done with a simple function, described below~\ref{order_edges} which can be called before applying Force. During our testing, the normal version of Order-Edges sets the ones with the most variables at the beginning of the order, while the \enquote{reversed} version sets them at the end.
 Finally, we tried another version called \enquote{Order-Edges 2} where this function is not called at the beginning of Force, but before each of its iterations.
@@ -421,15 +421,15 @@ It can be first noticed that no order of magnitude is gained nor lost due to the
         Medium & 5 & ~\ref{genetic_configuration} \\
         Short iteration & 6 & ~\ref{genetic_configuration} \\
         Short & 7 & ~\ref{genetic_configuration} \\
-        Force & 8 & ~\ref{force} \\
-        Order-Edges & 9 & ~\ref{order_edges} \\
-        Order-Edges and Pre-Post & 10 & ~\ref{order_edges} \\
-        Order-Edges reversed & 11 & ~\ref{order_edges} \\
-        Order-Edges reversed and Pre-Post & 12 & ~\ref{order_edges} \\
-        Order-Edges reversed and Pre-Post with slightly more iterations & 13 & ~\ref{order_edges} \\
-        Pre-Post & 14 & ~\ref{order-pre-post} \\
-        Order-Edges 2 & 15 & ~\ref{order_edges} \\
-        Order-Edges 2 reversed & 16 & ~\ref{order_edges}
+        Force & 8 & ~\ref{basic_force} \\
+        Order-Edges & 9 & ~\ref{sec:order_edges} \\
+        Order-Edges and Pre-Post & 10 & ~\ref{sec:order_edges} \\
+        Order-Edges reversed & 11 & ~\ref{sec:order_edges} \\
+        Order-Edges reversed and Pre-Post & 12 & ~\ref{sec:order_edges} \\
+        Order-Edges reversed and Pre-Post with slightly more iterations & 13 & ~\ref{sec:order_edges} \\
+        Pre-Post & 14 & ~\ref{sec:pre_post} \\
+        Order-Edges 2 & 15 & ~\ref{sec:order_edges} \\
+        Order-Edges 2 reversed & 16 & ~\ref{sec:order_edges}
       \end{tabular}
     }
     \label{algorithms}
