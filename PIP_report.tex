@@ -181,6 +181,7 @@ The solution we finally chose was to terminate Force when the span had stayed hi
 
 The data that fits best its regression is ~\ref{time_vs_(var+edges)} with a correlation coefficient of R=0.993 and the model is $time({\mu}s)= {9.2}*x^{1.17}$. For example with one of the largest model that has $5*10^4$ variables and $5*10^4$ edges, the duration of Force is $6.1$ seconds and the equation gives an estimation of $6.5$s.
 
+\newpage
 \section{The Pre-Post enhancement}
 
 Because the model-checker we use is based on Petri networks, there is another information we can use to build the order. As a matter of fact, the links (also called \enquote{transitions}) represent operations used on the variables to build the graph, and therefore have a direction. It means that a variable depends on another, and the link between variables can be unidirectional or bidirectional. It seems intuitive to put a variable after the ones it depends on. A variable others depend on is called \enquote{Pre}, a variable depending on another is a \enquote{Post}, and a bidirectional link involves Pre-Post variables. Using that information before each iteration of the algorithm proved to help decrease the span further in some cases.
@@ -205,20 +206,21 @@ During our testing, when we used the \enquote{Pre-Post} heuristic, this function
 
 In theory, sorting the edges at the beginning allows the order not to be changed too much, while still forcing the transition types to be as sorted as possible. Hence when processing an edge, we take the variables from all over and gather them at the edge's COG. Right after being processed, the edge has a minimal span; but because processing the next edges will also move the variables, it will progressively be unmade. This is the reason why we start by applying it to the edges with the highest span, and end with those with the lowest. The edges we process first probably won't respect the rule because the future operations will unmake the first ones; however we want to make sure that the edges with the smallest span do respect it, and because they are processed last, they will end with a minimal span.
 
+\newpage
 \section{Sorting the edges}
 
-The last enhancement we tried was to order the edges according to their number of variables. The idea was to gather the edges with the highest number of variables on one side of the order, either the beginning or the end : we experimented with both. Applying this can be done with a simple function, described below~\ref{order_edges} which can be called before applying Force. During our testing, the normal version of Order-Edges sets the ones with the most variables at the beginning of the order, while the \enquote{reversed} version sets them at the end.
+The last enhancement we tried was to order the edges according to their number of variables. The idea was to gather the edges with the highest number of variables on one side of the order, either the beginning or the end : we experimented with both. Applying this can be done with a simple function, described below~(\ref{order_edges}) which can be called before applying Force. During our testing, the normal version of Order-Edges sets the ones with the most variables at the beginning of the order, while the \enquote{reversed} version sets them at the end.
 Finally, we tried another version called \enquote{Order-Edges 2} where this function is not called at the beginning of Force, but before each of its iterations.
 
 \begin{algorithm}
-\begin{algorithmic}[1]
-\Function {Order Edges}{$variables$, $edges$}
-  \State {do a stable sort of the $edges$ according to the number of variables they connect to}
-  \State {compute the $edges$' $COG$s according to that order}
-  \State {compute the variables' new positions according to the $edges$' $COG$s}
-  \label{order_edges}
-\EndFunction
-\end{algorithmic}
+  \begin{algorithmic}[1]
+    \Function {Order Edges}{$variables$, $edges$}
+      \State {do a stable sort of the $edges$ according to the number of variables they connect to}
+      \State {compute the $edges$' $COG$s according to that order}
+      \State {compute the variables' new positions according to the $edges$' $COG$s}
+    \EndFunction
+    \label{order_edges}
+  \end{algorithmic}
 \end{algorithm}
 
 \chapter{A genetic algorithm}
@@ -349,9 +351,10 @@ Below, in figure \ref{success_percentage}, is displayed the percentage of succes
 \caption {Percentage of success for each algorithm, over the cases where at least one algorithm succeeded}
 \end{figure}
 
+\newpage
 \section{Genetic algorithm}
 
-In addition to the natural order, 6 different configurations have been tested, summarized in the following table:
+In addition to the natural order, 6 different configurations have been tested, summarized in table~\ref{genetic_configuration}.
 
 \begin{table}[!h]
   \begin{center}
@@ -363,9 +366,9 @@ In addition to the natural order, 6 different configurations have been tested, s
         ITERATION\_NUMBER   & 20    & 100    & 200  & 100             & 200              & 400            \\
         MUTATION\_SIZE      & 20    & 40     & 50   & 20              & 20               & 20             \\
         SELECTION\_SIZE     & 10    & 5      & 2    & 3               & 3                & 3             
+        \label{genetic_configuration}
       \end{tabular}
     }
-    \label{genetic_configuration}
     \caption{Variables used for the different results}
   \end{center}
 \end{table}
@@ -387,10 +390,11 @@ In addition to the natural order, 6 different configurations have been tested, s
 
 Like Force, the genetic algorithm has been tested in the same cases, with the same computer, so that the benchmarks can be compared.
 
-After running the benchmark, it appeared that the genetic algorithm only finishes the calculation in the cases where the natural order finishes. As the algorithm does not change the nature of the model, and does not use a particular representation like Force and the hyper-edges, it seems only logical that the percentage of success is kept at the same level.
+After running the benchmark~(\ref{genetic_results}), it appeared that the genetic algorithm only finishes the calculation in the cases where the natural order finishes. As the algorithm does not change the nature of the model, and does not use a particular representation like Force and the hyper-edges, it seems only logical that the percentage of success is kept at the same level.
 
 It can be first noticed that no order of magnitude is gained nor lost due to the algorithm. The best that was achieved was cutting the computing time by half. However, there are still many cases in which the genetic algorithm worsen the order in a way that is not fully understood yet. From that fact can be deduced that just as we had to take more parameters into account for Force, the quality of the order is not entirely dependent on the norm of the matrix used to represent the model. Therefore, a future work would consist in finding the various parameters that influence the order, and implement them in a new algorithm that may yield better results.
 
+\newpage
 \section{Comparison of the two algorithms}
 
 \begin{table}[!h]
